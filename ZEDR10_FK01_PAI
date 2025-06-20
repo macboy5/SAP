@@ -1,0 +1,149 @@
+*&---------------------------------------------------------------------*
+*&  Include           ZEDR10_FK01_PAI
+*&---------------------------------------------------------------------*
+*&---------------------------------------------------------------------*
+*&      Module  USER_COMMAND_0100  INPUT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+MODULE user_command_0100 INPUT.
+  " ## ##
+CASE OK_CODE.
+    WHEN 'SAVE'.
+
+      DATA : LV_ANSWER1 TYPE C,
+            LV_ANSWER2 TYPE C.
+      CLEAR : LV_ANSWER1, LV_ANSWER2.
+
+   DO.
+
+      CALL FUNCTION 'POPUP_TO_CONFIRM'
+        EXPORTING
+         TITLEBAR                    = '### ##'
+          text_question               = '### ### ########?'
+         TEXT_BUTTON_1               = 'YES'
+         TEXT_BUTTON_2               = 'NO'
+         DISPLAY_CANCEL_BUTTON       = ''
+       IMPORTING
+         ANSWER                      = LV_ANSWER1
+                .
+      IF sy-subrc <> 0.
+        MESSAGE '## ## # ### ######.' TYPE 'E'.
+        RETURN.
+      ENDIF.
+
+      IF LV_ANSWER1 = '1'. " YES ##
+        CALL METHOD gc_grid_0100->check_changed_data.
+        PERFORM UPDATE_STCD2.
+        MESSAGE '### ### ##### #######.' TYPE 'S'.
+        EXIT.
+
+      ELSEIF LV_ANSWER1 = '2'. " NO ##
+*        MESSAGE '### #######.' TYPE 'I'.
+        CALL FUNCTION 'POPUP_TO_CONFIRM'
+          EXPORTING
+           TITLEBAR                    = '## ##'
+            text_question               = '### #######. ## SKIP ######?'
+           TEXT_BUTTON_1               = '## SKIP'
+           TEXT_BUTTON_2               = '##'
+           DISPLAY_CANCEL_BUTTON       = ''
+         IMPORTING
+           ANSWER                      = LV_ANSWER2.
+
+          IF LV_ANSWER2 = '1'.
+            LEAVE TO SCREEN 100.
+            EXIT.
+          ELSEIF LV_ANSWER2 = '2'.
+            CONTINUE.
+          ENDIF.
+        ENDIF.
+
+      ENDDO.
+  ENDCASE.
+
+
+ENDMODULE.
+*&---------------------------------------------------------------------*
+*&      Module  EXIT_COMMAND  INPUT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+MODULE exit_command INPUT.
+
+  CASE OK_CODE.
+    WHEN 'BACK' OR 'CANC'.
+      LEAVE TO SCREEN 0.
+    WHEN 'EXIT'.
+      LEAVE PROGRAM.
+  ENDCASE.
+
+ENDMODULE.
+*&---------------------------------------------------------------------*
+*&      Module  USER_COMMAND_0200  INPUT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+MODULE user_command_0200 INPUT. " ####
+
+  CASE ok_code.
+    " ### ### ##.
+    WHEN 'INSERT'.
+      DATA : LV_ANSWER3 TYPE C.
+
+      CALL FUNCTION 'POPUP_TO_CONFIRM'
+            EXPORTING
+             TITLEBAR                    = '### ##'
+              text_question               = '##### ### #### ########?'
+             TEXT_BUTTON_1               = 'YES'
+             TEXT_BUTTON_2               = 'NO'
+             DISPLAY_CANCEL_BUTTON       = ''
+           IMPORTING
+             ANSWER                      = LV_ANSWER3.
+
+      IF LV_ANSWER3 EQ 1.
+
+        " ALV ### ## ### ## #### ##
+        CALL METHOD gc_grid_0200->check_changed_data.
+
+        LOOP AT gt_vendor INTO gs_vendor.
+
+          " ##### ## ##
+          SELECT COUNT(*) INTO @DATA(lv_count) FROM zlfA1_10.
+          gs_vendor-lifnr = lv_count + 1000000000.
+
+          " ## ## ##
+          GS_VENDOR-MANDT = SY-MANDT.
+          gs_vendor-bukrs = s_bukrs-low.
+          gs_vendor-ktokk = s_ktokk-low.
+
+          " INSERT# ### # ##
+          MOVE-CORRESPONDING gs_vendor TO gs_zlfa1_10.
+          MOVE-CORRESPONDING gs_vendor TO gs_zlfb1_10.
+          MOVE-CORRESPONDING gs_vendor TO gs_zlfm1_10.
+
+          " ####### INSERT
+          INSERT zlfa1_10 FROM gs_zlfa1_10.
+          INSERT zlfb1_10 FROM gs_zlfb1_10.
+          INSERT zlfm1_10 FROM gs_zlfm1_10.
+
+          CLEAR: gs_vendor, gs_zlfa1_10, gs_zlfb1_10, gs_zlfm1_10.
+
+        ENDLOOP.
+        MESSAGE '## #######.' TYPE 'I'.
+        ELSE.
+
+        ENDIF.
+
+      " ### ### ## ## # ### ## #####..
+      WHEN 'APPEND'.
+
+        CLEAR GS_VENDOR.
+        APPEND GS_VENDOR TO GT_VENDOR.
+
+      " ALV ##
+      CALL METHOD gc_grid_0200->refresh_table_display.
+
+
+  ENDCASE.
+
+ENDMODULE.
