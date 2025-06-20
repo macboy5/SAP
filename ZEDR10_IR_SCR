@@ -1,0 +1,54 @@
+*&---------------------------------------------------------------------*
+*&  Include           ZEDR10_IR_SCR
+*&---------------------------------------------------------------------*
+
+*&---------------------------------------------------------------------*
+*&  Include           ZEDR10_GR_SCR
+*&---------------------------------------------------------------------*
+
+SELECTION-SCREEN BEGIN OF BLOCK B1 WITH FRAME.
+
+  "####
+  SELECT-OPTIONS : S_EBELN FOR ZMSEG10-EBELN NO INTERVALS NO-EXTENSION.
+  " ###
+  SELECT-OPTIONS : S_WERKS FOR ZMSEG10-WERKS NO INTERVALS NO-EXTENSION.
+  " #####
+  SELECT-OPTIONS : S_DATE FOR SY-DATUM MODIF ID M1 DEFAULT SY-DATUM NO INTERVALS NO-EXTENSION.
+
+SELECTION-SCREEN END OF BLOCK B1.
+
+
+SELECTION-SCREEN BEGIN OF BLOCK B2 WITH FRAME.
+
+  SELECTION-SCREEN BEGIN OF LINE.
+    PARAMETERS : P_BTN1 RADIOBUTTON GROUP R1 USER-COMMAND UC1 DEFAULT 'X'.
+    SELECTION-SCREEN POSITION 3.
+    SELECTION-SCREEN COMMENT (10) FOR FIELD P_BTN1.
+
+    PARAMETERS : P_BTN2 RADIOBUTTON GROUP R1.
+    SELECTION-SCREEN POSITION 15.
+    SELECTION-SCREEN COMMENT (10) FOR FIELD P_BTN2.
+
+  SELECTION-SCREEN END OF LINE.
+
+SELECTION-SCREEN END OF BLOCK B2.
+
+
+
+AT SELECTION-SCREEN OUTPUT.
+  LOOP AT SCREEN.
+
+    CASE 'X'.
+      WHEN P_BTN1.
+        IF SCREEN-GROUP1 = 'M1'.
+          SCREEN-ACTIVE = 1.
+        ENDIF.
+      WHEN P_BTN2.
+        IF SCREEN-GROUP1 = 'M1'.
+          SCREEN-ACTIVE = 0.
+        ENDIF.
+    ENDCASE.
+
+    MODIFY SCREEN.
+
+  ENDLOOP.

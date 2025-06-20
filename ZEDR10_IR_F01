@@ -1,0 +1,745 @@
+*&---------------------------------------------------------------------*
+*&  Include           ZEDR10_IR_F01
+*&---------------------------------------------------------------------*
+FORM verify_scr .
+
+  " ### ### ##
+
+
+    " ## ##
+  IF p_btn1 = 'X'.
+
+    " ## ## ##
+    IF S_EBELN IS INITIAL OR S_WERKS IS INITIAL OR S_DATE IS INITIAL.
+      MESSAGE '### ### ## ####' TYPE 'I'.
+      EXIT.
+    ENDIF.
+
+    " PO ### ##( ## #### ###### ##)
+    DATA : lv_check1 TYPE c VALUE 'N',
+           lv_check2 TYPE c VALUE 'N'.
+
+    PERFORM VERIFY_PO USING lv_check1.
+    PERFORM VERIFY_WERKS USING lv_check2.
+
+
+    " ## # CALL SCREEN.
+    IF lv_check1 = 'X' AND LV_CHECK2 = 'X'.
+      CALL SCREEN 100.
+    ELSE.
+      MESSAGE '##### ### #### #####.' TYPE 'I'.
+      EXIT.
+    ENDIF.
+
+    " ##  ##
+  ELSE.
+    " ## ## ##
+    IF S_EBELN IS INITIAL OR S_WERKS IS INITIAL.
+      MESSAGE '### ### ## ####' TYPE 'I'.
+      EXIT.
+    ENDIF.
+
+    "## ## ####
+    PERFORM GET_DATA_SG.
+
+    IF GT_ALV[] IS NOT INITIAL.
+      CALL SCREEN 200.
+    ELSE.
+      MESSAGE '## ### #####.' TYPE 'I'.
+      EXIT.
+    ENDIF.
+
+
+
+  ENDIF.
+
+ENDFORM.
+FORM verify_PO  USING   p_check1.
+
+  SELECT * FROM ZEKKO10 INTO CORRESPONDING FIELDS OF TABLE GT_ZEKKO10.
+
+  LOOP AT GT_ZEKKO10 INTO GS_ZEKKO10.
+    IF GS_ZEKKO10-EBELN = S_EBELN-LOW.
+      p_check1 = 'X'.
+      EXIT.
+    ENDIF.
+  ENDLOOP.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  VERIFY_GR_WERKS
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*      -->P_LV_CHECK2  text
+*----------------------------------------------------------------------*
+FORM verify_werks  USING    p_check2.
+
+  SELECT * FROM ZEKPO10 INTO CORRESPONDING FIELDS OF TABLE GT_ZEKPO10.
+
+  LOOP AT GT_ZEKPO10 INTO GS_ZEKPO10.
+    IF GS_ZEKPO10-WERKS = S_WERKS-LOW AND GS_ZEKPO10-EBELN = S_EBELN-LOW.
+      p_check2 = 'X'.
+      EXIT.
+    ENDIF.
+  ENDLOOP.
+
+
+ENDFORM.
+FORM refresh USING P_GRID TYPE REF TO CL_GUI_ALV_GRID .
+
+  DATA : ls_stable TYPE lvc_s_stbl.
+
+
+  " #### USER OOMMAND ### # ### ### ### ###.
+  ls_stable-row = 'X'.
+  ls_stable-col = 'X'.
+
+  CALL METHOD P_GRID->refresh_table_display
+    EXPORTING
+      is_stable = ls_stable.
+
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  CREATE_OBJECT_0100
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM create_object_0100 .
+  CREATE OBJECT gc_docking_0100
+  EXPORTING
+    repid                       = SY-REPID
+    dynnr                       = SY-DYNNR
+    extension                   = 2000.
+
+CREATE OBJECT gc_grid_0100
+  EXPORTING
+    i_parent          = GC_DOCKING_0100.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  ALV_FIELDCAT_0100
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM alv_fieldcat_0100 .
+  CLEAR : GS_FIELDCAT_0100, GT_FIELDCAT_0100.
+  GS_FIELDCAT_0100-COL_POS = '1'.
+  GS_FIELDCAT_0100-FIELDNAME = 'L_CHECK'.
+  GS_FIELDCAT_0100-COLTEXT = '##'.
+  GS_FIELDCAT_0100-EDIT = 'X'.
+  GS_FIELDCAT_0100-CHECKBOX = 'X'.
+  APPEND GS_FIELDCAT_0100 TO GT_FIELDCAT_0100.
+
+  CLEAR : GS_FIELDCAT_0100.
+  GS_FIELDCAT_0100-COL_POS = '2'.
+  GS_FIELDCAT_0100-FIELDNAME = 'BUKRS'.
+  GS_FIELDCAT_0100-COLTEXT = '####'.
+  APPEND GS_FIELDCAT_0100 TO GT_FIELDCAT_0100.
+
+  CLEAR : GS_FIELDCAT_0100.
+  GS_FIELDCAT_0100-COL_POS = '3'.
+  GS_FIELDCAT_0100-FIELDNAME = 'EBELN'.
+  GS_FIELDCAT_0100-COLTEXT = '######'.
+  APPEND GS_FIELDCAT_0100 TO GT_FIELDCAT_0100.
+
+  CLEAR : gs_fieldcat_0100.
+  gs_fieldcat_0100-col_pos = '4'.
+  gs_fieldcat_0100-fieldname = 'BPRME'.
+  gs_fieldcat_0100-coltext = '####'.
+  APPEND gs_fieldcat_0100 TO gt_fieldcat_0100.
+
+  CLEAR : gs_fieldcat_0100.
+  gs_fieldcat_0100-col_pos = '5'.
+  gs_fieldcat_0100-fieldname = 'MWSTS'.
+  gs_fieldcat_0100-coltext = '##'.
+  APPEND gs_fieldcat_0100 TO gt_fieldcat_0100.
+
+  CLEAR : gs_fieldcat_0100.
+  gs_fieldcat_0100-col_pos = '6'.
+  gs_fieldcat_0100-fieldname = 'PRICE'.
+  gs_fieldcat_0100-coltext = '##'.
+  APPEND gs_fieldcat_0100 TO gt_fieldcat_0100.
+
+  CLEAR : gs_fieldcat_0100.
+  gs_fieldcat_0100-col_pos = '7'.
+  gs_fieldcat_0100-fieldname = 'WAERS'.
+  gs_fieldcat_0100-coltext = '##'.
+  APPEND gs_fieldcat_0100 TO gt_fieldcat_0100.
+
+  CLEAR : gs_fieldcat_0100.
+  gs_fieldcat_0100-col_pos = '8'.
+  gs_fieldcat_0100-fieldname = 'MWSKZ'.
+  gs_fieldcat_0100-coltext = '####'.
+  APPEND gs_fieldcat_0100 TO gt_fieldcat_0100.
+
+  CLEAR : gs_fieldcat_0100.
+  gs_fieldcat_0100-col_pos = '9'.
+  gs_fieldcat_0100-fieldname = 'SGTXT'.
+  gs_fieldcat_0100-coltext = '###'.
+  APPEND gs_fieldcat_0100 TO gt_fieldcat_0100.
+
+  CLEAR : gs_fieldcat_0100.
+  gs_fieldcat_0100-col_pos = '10'.
+  gs_fieldcat_0100-fieldname = 'LIFNR'.
+  gs_fieldcat_0100-coltext = '###'.
+  APPEND gs_fieldcat_0100 TO gt_fieldcat_0100.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  ALV_LAYOUT_0100
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM alv_layout_0100 .
+  CLEAR : GS_LAYOUT_0100.
+  GS_LAYOUT_0100-ZEBRA = 'X'.
+
+  CLEAR : GS_VARIANT.
+  gs_variant-username = sy-uname.
+  gs_variant-report = sy-repid.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  ALV_SORT_0100
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM alv_sort_0100 .
+  CLEAR : gs_sort_0100, gt_sort_0100.
+
+  gs_sort_0100-spos = 1.
+  gs_sort_0100-fieldname = 'BUKRS'.
+  gs_sort_0100-up = 'X'.
+  APPEND gs_sort_0100 TO gt_sort_0100.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  CLASS_EVENT_0100
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM class_event_0100 .
+    CALL METHOD gc_grid_0100->register_edit_event
+    EXPORTING
+      i_event_id = CL_GUI_ALV_GRID=>MC_EVT_MODIFIED
+*    EXCEPTIONS
+*      error      = 1
+*      others     = 2
+          .
+  IF sy-subrc <> 0.
+*   Implement suitable error handling here
+  ENDIF.
+
+  CREATE OBJECT GO_EVENT_0100.
+
+  SET HANDLER GO_EVENT_0100->HANDLER_DATA_CHANGED FOR GC_GRID_0100.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  ALV_DISPLAY_0100
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM alv_display_0100 .
+    CALL METHOD gc_grid_0100->set_table_for_first_display
+    EXPORTING
+      is_variant      = gs_variant
+      i_save          = 'A'
+      i_default       = 'X'
+      is_layout       = gs_layout_0100
+    CHANGING
+      it_outtab       = GT_ALV
+      it_fieldcatalog = gt_fieldcat_0100
+      it_sort         = gt_sort_0100.
+  IF sy-subrc <> 0.
+*   Implement suitable error handling here
+  ENDIF.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  CREATE_OBJECT_0200
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM create_object_0200 .
+CREATE OBJECT gc_docking_0200
+  EXPORTING
+    repid                       = SY-REPID
+    dynnr                       = SY-DYNNR
+    extension                   = 2000.
+
+CREATE OBJECT gc_grid_0200
+  EXPORTING
+    i_parent          = GC_DOCKING_0200.
+
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  ALV_FIELDCAT_0200
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM alv_fieldcat_0200 .
+
+ CLEAR : GS_FIELDCAT_0200, GT_FIELDCAT_0200.
+  GS_FIELDCAT_0200-COL_POS = '1'.
+  GS_FIELDCAT_0200-FIELDNAME = 'L_CHECK'.
+  GS_FIELDCAT_0200-COLTEXT = '##'.
+  GS_FIELDCAT_0200-EDIT = 'X'.
+  GS_FIELDCAT_0200-CHECKBOX = 'X'.
+  APPEND GS_FIELDCAT_0200 TO GT_FIELDCAT_0200.
+
+  CLEAR : GS_FIELDCAT_0200.
+  GS_FIELDCAT_0200-COL_POS = '2'.
+  GS_FIELDCAT_0200-FIELDNAME = 'BUKRS'.
+  GS_FIELDCAT_0200-COLTEXT = '####'.
+  APPEND GS_FIELDCAT_0200 TO GT_FIELDCAT_0200.
+
+  CLEAR : GS_FIELDCAT_0200.
+  GS_FIELDCAT_0200-COL_POS = '3'.
+  GS_FIELDCAT_0200-FIELDNAME = 'BPRME'.
+  GS_FIELDCAT_0200-COLTEXT = '####'.
+  APPEND GS_FIELDCAT_0200 TO GT_FIELDCAT_0200.
+
+  CLEAR : GS_FIELDCAT_0200.
+  GS_FIELDCAT_0200-COL_POS = '4'.
+  GS_FIELDCAT_0200-FIELDNAME = 'MWSTS'.
+  GS_FIELDCAT_0200-COLTEXT = '##'.
+  APPEND GS_FIELDCAT_0200 TO GT_FIELDCAT_0200.
+
+  CLEAR : gs_fieldcat_0200.
+  gs_fieldcat_0200-col_pos = '5'.
+  gs_fieldcat_0200-fieldname = 'PRICE'.
+  gs_fieldcat_0200-coltext = '##'.
+  APPEND gs_fieldcat_0200 TO gt_fieldcat_0200.
+
+
+  CLEAR : gs_fieldcat_0200.
+  gs_fieldcat_0200-col_pos = '6'.
+  gs_fieldcat_0200-fieldname = 'WAERS'.
+  gs_fieldcat_0200-coltext = '##'.
+  APPEND gs_fieldcat_0200 TO gt_fieldcat_0200.
+
+  CLEAR : gs_fieldcat_0200.
+  gs_fieldcat_0200-col_pos = '7'.
+  gs_fieldcat_0200-fieldname = 'MWSKZ'.
+  gs_fieldcat_0200-coltext = '####'.
+  APPEND gs_fieldcat_0200 TO gt_fieldcat_0200.
+
+  CLEAR : gs_fieldcat_0200.
+  gs_fieldcat_0200-col_pos = '8'.
+  gs_fieldcat_0200-fieldname = 'SGTXT'.
+  gs_fieldcat_0200-coltext = '###'.
+  APPEND gs_fieldcat_0200 TO gt_fieldcat_0200.
+
+  CLEAR : gs_fieldcat_0200.
+  gs_fieldcat_0200-col_pos = '9'.
+  gs_fieldcat_0200-fieldname = 'LIFNR'.
+  gs_fieldcat_0200-coltext = '###'.
+  APPEND gs_fieldcat_0200 TO gt_fieldcat_0200.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  ALV_LAYOUT_0200
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM alv_layout_0200 .
+  CLEAR : GS_LAYOUT_0200.
+  GS_LAYOUT_0200-ZEBRA = 'X'.
+
+  CLEAR : GS_VARIANT.
+  gs_variant-username = sy-uname.
+  gs_variant-report = sy-repid.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  ALV_SORT_0200
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM alv_sort_0200 .
+  CLEAR : gs_sort_0200, gt_sort_0200.
+
+  gs_sort_0200-spos = 1.
+  gs_sort_0200-fieldname = 'BUKRS'.
+  gs_sort_0200-up = 'X'.
+  APPEND gs_sort_0200 TO gt_sort_0200.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  CLASS_EVENT_0200
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM class_event_0200 .
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  ALV_DISPLAY_0200
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM alv_display_0200 .
+    CALL METHOD gc_grid_0200->set_table_for_first_display
+    EXPORTING
+      is_variant      = gs_variant
+      i_save          = 'A'
+      i_default       = 'X'
+      is_layout       = gs_layout_0200
+    CHANGING
+      it_outtab       = GT_ALV
+      it_fieldcatalog = gt_fieldcat_0200
+      it_sort         = gt_sort_0200.
+  IF sy-subrc <> 0.
+*   Implement suitable error handling here
+  ENDIF.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  GET_DATA
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM get_data .
+
+  " ## ZRBKP10 ### ZRSEG10 #### ####.(?)
+
+  SELECT *
+    INTO CORRESPONDING FIELDS OF TABLE GT_ALV
+    FROM ZRBKP10 AS A
+    INNER JOIN ZRSEG10 AS B
+    ON A~IRNUM = B~IRNUM AND
+    A~GJAHR = B~GJAHR
+    WHERE B~EBELN = S_EBELN-LOW AND
+    B~WERKS = S_WERKS-LOW.
+
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  ALV_HANDLER_DATA_CHANGED
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*      -->P_ER_DATA_CHANGED  text
+*      -->P_E_ONF4  text
+*      -->P_E_ONF4_BEFORE  text
+*      -->P_E_ONF4_AFTER  text
+*      -->P_E_UCOMM  text
+*----------------------------------------------------------------------*
+FORM alv_handler_data_changed  USING    p_data_changed
+                                        p_onf4
+                                        p_onf4_before
+                                        p_onf4_after
+                                        p_ucomm.
+
+
+
+
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  INSERT_IR
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM STORE .  " ## ## ## ### ## ### ##.
+
+  DATA : LV_ANSWER TYPE N LENGTH 1.
+  CLEAR : LV_ANSWER.
+
+  CALL FUNCTION 'POPUP_TO_CONFIRM'
+    EXPORTING
+     TITLEBAR                    = '## ## '
+      text_question               = '### ########?'
+     TEXT_BUTTON_1               = '#'
+     TEXT_BUTTON_2               = '###'
+     DISPLAY_CANCEL_BUTTON       = ''
+   IMPORTING
+     ANSWER                      = LV_ANSWER.
+
+  IF LV_ANSWER EQ 1.
+
+        DATA : LV_IRNUM TYPE N LENGTH 10,
+              LV_ITEM TYPE N LENGTH 2.
+        CLEAR : LV_IRNUM, LV_ITEM.
+
+         "  IRNUM ####  ####.
+        CALL FUNCTION 'NUMBER_GET_NEXT'
+          EXPORTING
+            nr_range_nr = '01'
+            object      = 'ZNR10_3'
+          IMPORTING
+            number      = LV_IRNUM.
+
+   LOOP AT GT_ALV INTO GS_ALV.
+
+     IF GS_ALV-L_CHECK = 'X'. " ## ## # ## ##.
+
+       " ## ##
+       MOVE-CORRESPONDING GS_ALV TO GS_ZRBKP10.
+       GS_ZRBKP10-MANDT = SY-MANDT.
+
+       " BUKRS WAERS LIFNR MWSKZ
+
+       " IRNUM GJAHR BLART BLDAT BUDAT  RMWWR WMWST1
+       GS_ZRBKP10-IRNUM = LV_IRNUM.
+       GS_ZRBKP10-GJAHR = SY-DATUM(4).
+*       GS_ZRBKP10-BLART =
+       GS_ZRBKP10-BLDAT = S_DATE-LOW.
+       GS_ZRBKP10-BUDAT = S_DATE-LOW.
+
+       CONCATENATE GS_ALV-SGTXT LV_IRNUM INTO GS_ALV-SGTXT.
+
+
+       " ## ###
+       MOVE-CORRESPONDING GS_ALV TO GS_ZRSEG10.
+       GS_ZRSEG10-MANDT = SY-MANDT.
+
+       " EBELN EBELP MATNR BUKRS WERKS MENGE MEINS MWSKZ
+
+       " IRNUM  GJAHR BUZEI  SHKZG  WRBTR ZFLAG
+
+        GS_ZRSEG10-IRNUM = LV_IRNUM.
+        GS_ZRSEG10-GJAHR = SY-DATUM(4).
+        LV_ITEM = LV_ITEM + 10.
+        GS_ZRSEG10-BUZEI = LV_ITEM.
+        GS_ZRSEG10-SHKZG = 'S'.
+
+       " ## ## ##.
+       GS_ZRSEG10-ZFLAG = 'X'.
+
+
+
+       APPEND GS_ZRBKP10 TO GT_ZRBKP10.
+       APPEND GS_ZRSEG10 TO GT_ZRSEG10.
+
+
+
+     ENDIF.
+   ENDLOOP.
+
+      MODIFY ZRBKP10 FROM TABLE GT_ZRBKP10.
+      MODIFY ZRSEG10 FROM TABLE GT_ZRSEG10.
+
+      DELETE GT_ALV WHERE L_CHECK = 'X'.
+
+      PERFORM REFRESH USING GC_GRID_0100.
+
+  ELSE.
+    MESSAGE |## ### #######| TYPE 'E'.
+
+  ENDIF.
+
+
+
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  SELECT_DATA_CREATE
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM select_data_create . " ## ## # ### ####.
+
+  " ####, ###, ###### ### #####.
+
+  " ####, ######, ####, ##, ##, ##, ####, ###(po##+####), ###
+  " #### ### ## ####, ### ## # ##.
+  " #### ### ##, #### ## # ##.
+
+
+  SELECT *
+    INTO CORRESPONDING FIELDS OF TABLE GT_ALV
+    FROM ZEKKO10 AS A
+    INNER JOIN ZEKPO10 AS B
+    ON A~EBELN = B~EBELN
+    INNER JOIN ZLFM1_10 AS C
+    ON C~LIFNR = A~LIFNR AND
+       C~EKGRP = A~EKGRP AND
+       C~EKORG = A~EKORG
+    WHERE A~EBELN = S_EBELN-LOW AND
+          B~WERKS = S_WERKS-LOW.
+
+
+  " ## ## ## ###.
+  SELECT *
+    INTO CORRESPONDING FIELDS OF TABLE GT_ZRSEG10
+    FROM ZRSEG10
+    FOR ALL ENTRIES IN GT_ALV
+    WHERE EBELN = GT_ALV-EBELN
+    AND   EBELP = GT_ALV-EBELP.
+
+
+
+  DATA : LV_INDEX TYPE I.
+  CLEAR : LV_INDEX.
+
+  " BPRME MWSTS PRICE
+  " ##### ZEKPO10-BPRME ### ##, ## ## ##.
+  LOOP AT GT_ALV INTO GS_ALV.
+    LV_INDEX = SY-TABIX.
+
+    READ TABLE GT_ZRSEG10 WITH KEY EBELN = GS_ALV-EBELN
+                                   EBELP = GS_ALV-EBELP
+                                   INTO GS_ZRSEG10.
+
+    IF GS_ZRSEG10 IS NOT INITIAL.
+      DELETE GT_ALV INDEX LV_INDEX.
+      CLEAR : GS_ALV, GS_ZRSEG10.
+      CONTINUE.
+    ENDIF.
+
+
+    " ## ## = ## * ##.
+    GS_ALV-BPRME = GS_ALV-BPRME * GS_ALV-MENGE.
+    GS_ALV-BUZEI = SY-TABIX.
+
+    " ## ##
+    CASE GS_ALV-MWSKZ.
+      WHEN 'V1'.
+        GS_ALV-MWSTS = GS_ALV-BPRME * '0.1'.
+      WHEN 'V2'.
+        GS_ALV-MWSTS = GS_ALV-BPRME * '0.0'.
+      WHEN 'V3'.
+        GS_ALV-MWSTS = GS_ALV-BPRME * '0.0'.
+      WHEN 'V4'.
+        GS_ALV-MWSTS = GS_ALV-BPRME * '0.0'.
+      WHEN 'V5'.
+        GS_ALV-MWSTS = GS_ALV-BPRME * '0.0'.
+    ENDCASE.
+
+    "## = ## ## + ##.
+    GS_ALV-PRICE = GS_ALV-BPRME + GS_ALV-MWSTS.
+
+    " ### SGTXT (PO## + ####)
+    CONCATENATE GS_ALV-EBELN '####' INTO GS_ALV-SGTXT.
+
+    MODIFY GT_ALV FROM GS_ALV.
+
+
+  ENDLOOP.
+
+
+  " ## ## # # ALV## #### ####...####?
+
+
+
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  GET_DATA_SG
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM get_data_sg .  " ## ## ####
+
+  " ## ## ZRBKP10 ## ### ZRSEG10
+
+  SELECT *
+    INTO CORRESPONDING FIELDS OF TABLE GT_ALV
+    FROM ZRBKP10 AS A
+    INNER JOIN ZRSEG10 AS B
+    ON A~IRNUM = B~IRNUM AND
+       A~GJAHR = B~GJAHR
+    WHERE B~WERKS = S_WERKS-LOW AND
+          B~EBELN = S_EBELN-LOW.
+
+*    " BPRME MWSTS PRICE
+*    LOOP AT GT_ALV INTO GS_ALV.
+*
+*      GS_ALV-BPRME = GS_ALV-RMWWR - GS_ALV-WMWST1.
+*      GS_ALV-MWSTS = GS_ALV-WMWST1.
+*      GS_ALV-PRICE = GS_ALV-RMWWR.
+*
+*      MODIFY GT_ALV FROM GS_ALV.
+*    ENDLOOP.
+
+
+
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  CANCEL_SG
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM cancel_sg .  " ## ## ##.
+
+  " ### ## ### ## ##. ### ### ## ## ## ALV# ####.
+
+
+  CALL METHOD GC_GRID_0200->CHECK_CHANGED_DATA.
+
+  LOOP AT GT_ALV INTO GS_ALV.
+
+      IF GS_ALV-L_CHECK = 'X'.
+
+        " ZRSEG10## ## ### ##.
+        DELETE FROM ZRSEG10
+               WHERE IRNUM = GS_ALV-IRNUM AND
+                     GJAHR = GS_ALV-GJAHR AND
+                     BUZEI = GS_ALV-BUZEI.
+
+
+
+      ENDIF.
+
+  ENDLOOP.
+
+  " ALV## #### ##.
+  DELETE GT_ALV WHERE L_CHECK = 'X'.
+  PERFORM REFRESH USING GC_GRID_0200.
+
+ENDFORM.
