@@ -1,0 +1,135 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="application/xhtml+xml; charset=EUC-KR" />
+<title>ZEDR10_PO_TOP</title>
+<style type="text/css">
+.code{ font-family:"Courier New", Courier, monospace; color:#000; font-size:14px; background-color:#F2F4F7 }
+  .codeComment {font-family:"Courier New", Courier, monospace; color:#0000F0; font-size:14px; background-color:#F2F4F7 }
+  .normalBold{ font-family:Arial, Helvetica, sans-serif; color:#000; font-size:12px; font-weight:800 }
+  .normalBoldLarge{ font-family:Arial, Helvetica, sans-serif; color:#000; font-size:16px; font-weight:800 }
+</style>
+<style type="text/css">
+  .normal{ font-family:Arial, Helvetica, sans-serif; color:#000; font-size:12px }
+  .footer{ font-family:Arial, Helvetica, sans-serif; color:#000; font-size:12px; text-align: center }
+  h2{ font-family:Arial, Helvetica, sans-serif; color:#000; font-size:16px; font-weight:800 }
+  h3{ font-family:Arial, Helvetica, sans-serif; color:#000; font-size:14px; font-weight:800 }
+  .outerTable{
+   background-color:#E0E7ED;
+   width:100%;
+   border-top-width: thin;
+   border-right-width: thin;
+   border-right-width: thin;
+   border-left-width: thin;
+   border-top-style: solid;
+   border-right-style: solid;
+   border-bottom-style: solid;
+   border-left-style: solid;
+  }
+  .innerTable{
+   background-color:#F2F4F7;
+   width:100%;
+   border-top-width: thin;
+   border-right-width: thin;
+   border-bottom-width: thin;
+   border-left-width: thin;
+   border-top-style: solid;
+   border-right-style: solid;
+   border-bottom-style: solid;
+   border-left-style: solid;
+  }
+</style>
+</head>
+<body>
+<table class="outerTable">
+  <tr class="normalBoldLarge">
+     <td><h2>Code listing for: ZEDR10_PO_TOP</h2>
+<h3> Description: Include ZEDR10_PO_TOP</h3></td>
+   </tr>
+  <tr>
+     <td>
+     <table class="innerTable">
+       <tr>
+          <td>
+   <div class="codeComment">
+*&---------------------------------------------------------------------*<br />
+*&&nbsp;&nbsp;Include&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ZEDR10_PO_TOP<br />
+*&---------------------------------------------------------------------*<br />
+<br />
+   </div>
+   <div class="code">
+TABLES : ZEKKO10.<br />
+<br />
+DATA : OK_CODE TYPE SY-UCOMM.<br />
+<br />
+DATA : GS_ZEKKO10 TYPE ZEKKO10.<br />
+DATA : GT_ZEKKO10 LIKE TABLE OF GS_ZEKKO10.<br />
+<br />
+DATA : GS_ZEKPO10 TYPE ZEKPO10.<br />
+DATA : GT_ZEKPO10 LIKE TABLE OF GS_ZEKPO10.<br />
+<br />
+DATA : GS_ZLFM1_10 TYPE ZLFM1_10.<br />
+DATA : GT_ZLFM1_10 LIKE TABLE OF GS_ZLFM1_10.<br />
+<br />
+DATA : GS_ZEDT10_200 TYPE ZEDT10_200.<br />
+DATA : GT_ZEDT10_200 LIKE TABLE OF GS_ZEDT10_200.   " #####<br />
+<br />
+<br />
+DATA : BEGIN OF GS_PO.<br />
+&nbsp;&nbsp;DATA&nbsp;:&nbsp;ICON&nbsp;TYPE&nbsp;C&nbsp;LENGTH&nbsp;4,&nbsp;&nbsp;&nbsp;&nbsp;"&nbsp;#####<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EBELN&nbsp;TYPE&nbsp;ZEKKO10-EBELN,&nbsp;"&nbsp;PO##<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BUKRS&nbsp;TYPE&nbsp;ZEKKO10-BUKRS,&nbsp;"&nbsp;####<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EKGRP&nbsp;TYPE&nbsp;ZEKKO10-EKGRP,&nbsp;"&nbsp;####<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EKORG&nbsp;TYPE&nbsp;ZEKKO10-EKORG,&nbsp;"&nbsp;####<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;LIFNR&nbsp;TYPE&nbsp;ZEKKO10-LIFNR,&nbsp;"&nbsp;###(##)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BEDAT&nbsp;TYPE&nbsp;ZEKKO10-BEDAT,&nbsp;"&nbsp;###<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;WAERS&nbsp;TYPE&nbsp;ZEKKO10-WAERS,&nbsp;"&nbsp;##<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EBELP&nbsp;TYPE&nbsp;ZEKPO10-EBELP,&nbsp;"&nbsp;##<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MATNR&nbsp;TYPE&nbsp;ZEKPO10-MATNR,&nbsp;"&nbsp;####<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MAKTX&nbsp;TYPE&nbsp;ZEKPO10-MAKTX,&nbsp;"&nbsp;###<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MENGE&nbsp;TYPE&nbsp;ZEKPO10-MENGE,&nbsp;"&nbsp;##<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;REMAIN_MENGE&nbsp;TYPE&nbsp;ZEKPO10-REMAIN_MENGE,&nbsp;&nbsp;&nbsp;"&nbsp;##&nbsp;##<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MEINS&nbsp;TYPE&nbsp;ZEKPO10-MEINS,&nbsp;"&nbsp;##<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BPRME&nbsp;TYPE&nbsp;ZEKPO10-BPRME,&nbsp;"&nbsp;##<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PRDAT&nbsp;TYPE&nbsp;ZEKPO10-PRDAT,&nbsp;"&nbsp;###<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;WERKS&nbsp;TYPE&nbsp;ZEKPO10-WERKS,&nbsp;"&nbsp;###<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;LGORT&nbsp;TYPE&nbsp;ZEKPO10-LGORT,&nbsp;"&nbsp;####<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MWSKZ&nbsp;TYPE&nbsp;ZLFM1_10-MWSKZ.&nbsp;"&nbsp;####<br />
+DATA : END OF GS_PO.<br />
+DATA : GT_PO LIKE TABLE OF GS_PO.<br />
+<br />
+DATA : GC_DOCKING_0100 TYPE REF TO CL_GUI_DOCKING_CONTAINER.  " PO ##<br />
+DATA : GC_DOCKING_0200 TYPE REF TO CL_GUI_DOCKING_CONTAINER.  " PO ##<br />
+<br />
+DATA : GC_GRID_0100 TYPE REF TO CL_GUI_ALV_GRID.<br />
+DATA : GC_GRID_0200 TYPE REF TO CL_GUI_ALV_GRID.<br />
+<br />
+DATA : GS_FIELDCAT_0100 TYPE LVC_S_FCAT.<br />
+DATA : GT_FIELDCAT_0100 TYPE LVC_T_FCAT.<br />
+DATA : GS_FIELDCAT_0200 TYPE LVC_S_FCAT.<br />
+DATA : GT_FIELDCAT_0200 TYPE LVC_T_FCAT.<br />
+<br />
+DATA : GS_SORT_0100 TYPE LVC_S_SORT.<br />
+DATA : GT_SORT_0100 TYPE LVC_T_SORT.<br />
+DATA : GS_SORT_0200 TYPE LVC_S_SORT.<br />
+DATA : GT_SORT_0200 TYPE LVC_T_SORT.<br />
+<br />
+DATA : GS_LAYOUT_0100 TYPE LVC_S_LAYO.<br />
+DATA : GS_LAYOUT_0200 TYPE LVC_S_LAYO.<br />
+<br />
+DATA : GS_VARIANT TYPE DISVARIANT.<br />
+<br />
+DATA : GO_EVENT_0100 TYPE REF TO EVENT.<br />
+DATA : GO_EVENT_0200 TYPE REF TO EVENT.<br />
+            </div>
+          </td>
+        </tr>
+      </table>
+      </td>
+      </tr>
+   <tr>
+<td class="footer">Extracted by Mass Download version 1.4.6 - E.G.Mellodew. 1998-2025. Sap Release 750</td>
+   </tr>
+</table>
+</body>
+</html>
