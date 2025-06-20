@@ -1,0 +1,16 @@
+*&---------------------------------------------------------------------*
+*& Report ZEDR10_IR
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZEDR10_IR.
+
+INCLUDE ZEDR10_IR_CLS.
+INCLUDE ZEDR10_IR_TOP.
+INCLUDE ZEDR10_IR_SCR.
+INCLUDE ZEDR10_IR_F01.
+INCLUDE ZEDR10_IR_PB0.
+INCLUDE ZEDR10_IR_PAI.
+
+START-OF-SELECTION.
+  PERFORM VERIFY_SCR.
