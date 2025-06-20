@@ -1,0 +1,89 @@
+*&---------------------------------------------------------------------*
+*&  Include           ZEDR10_GR_PBO
+*&---------------------------------------------------------------------*
+*&---------------------------------------------------------------------*
+*&      Module  STATUS_0100  OUTPUT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+MODULE status_0100 OUTPUT.
+  SET PF-STATUS 'STATUS_0100'.
+  SET TITLEBAR '0100'.
+ENDMODULE.
+*&---------------------------------------------------------------------*
+*&      Module  SET_ALV_0100  OUTPUT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+MODULE set_alv_0100 OUTPUT.
+
+IF GC_DOCKING_0100 IS INITIAL.
+  PERFORM CREATE_OBJECT_0100.
+  PERFORM ALV_FIELDCAT_0100.
+  PERFORM ALV_LAYOUT_0100.
+  PERFORM ALV_SORT_0100.
+  PERFORM CLASS_EVENT_0100.
+  PERFORM SELECT_PO_LIST.
+  PERFORM ALV_DISPLAY_0100.
+ELSE.
+  PERFORM REFRESH USING GC_GRID_0100.
+ENDIF.
+
+ENDMODULE.
+*&---------------------------------------------------------------------*
+*&      Module  STATUS_0200  OUTPUT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+MODULE status_0200 OUTPUT.
+  SET PF-STATUS 'STATUS_0200'.
+  SET TITLEBAR '0200'.
+ENDMODULE.
+*&---------------------------------------------------------------------*
+*&      Module  SET_ALV_0200  OUTPUT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+MODULE set_alv_0200 OUTPUT.
+
+IF GC_DOCKING_0200 IS INITIAL.
+  PERFORM CREATE_OBJECT_0200.
+  PERFORM ALV_FIELDCAT_0200.
+  PERFORM ALV_LAYOUT_0200.
+  PERFORM ALV_SORT_0200.
+  PERFORM CLASS_EVENT_0200.
+  PERFORM ALV_DISPLAY_0200.
+ELSE.
+  PERFORM REFRESH USING GC_GRID_0200.
+ENDIF.
+
+ENDMODULE.
+*&---------------------------------------------------------------------*
+*&      Module  STATUS_0300  OUTPUT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+MODULE status_0300 OUTPUT.
+  SET PF-STATUS 'STATUS_0300'.
+  SET TITLEBAR '0300'.
+ENDMODULE.
+*&---------------------------------------------------------------------*
+*&      Module  SET_ALV_0300  OUTPUT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+MODULE set_alv_0300 OUTPUT.
+
+IF GC_DOCKING_0300 IS INITIAL.
+  PERFORM CREATE_OBJECT_0300.
+  PERFORM ALV_FIELDCAT_0300.
+  PERFORM ALV_LAYOUT_0300.
+  PERFORM ALV_SORT_0300.
+  PERFORM CLASS_EVENT_0300.
+  PERFORM ALV_DISPLAY_0300.
+ELSE.
+  PERFORM REFRESH USING GC_GRID_0300.
+ENDIF.
+
+
+ENDMODULE.
