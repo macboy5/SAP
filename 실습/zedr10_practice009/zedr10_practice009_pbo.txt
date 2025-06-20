@@ -1,0 +1,50 @@
+*&---------------------------------------------------------------------*
+*&  Include           ZEDR10_PRACTICE009_PBO
+*&---------------------------------------------------------------------*
+*&---------------------------------------------------------------------*
+*&      Module  STATUS_0100  OUTPUT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+MODULE status_0100 OUTPUT.
+  SET PF-STATUS 'STATUS_0100'.
+  SET TITLEBAR 'T100'.
+ENDMODULE.
+*&---------------------------------------------------------------------*
+*&      Module  STATUS_0200  OUTPUT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+MODULE status_0200 OUTPUT.
+  SET PF-STATUS 'STATUS_0200'.
+  SET TITLEBAR 'T200'.
+ENDMODULE.
+*&---------------------------------------------------------------------*
+*&      Module  SET_ALV_100  OUTPUT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+MODULE set_alv_100 OUTPUT.
+  PERFORM CREATE_OBJECT USING GC_DOCKING GC_GRID_100.
+  PERFORM ALV_FIELDCAT_100.
+  PERFORM ALV_LAYOUT.
+  PERFORM ALV_SORT.
+*  BREAK-POINT.
+  PERFORM ALV_DISPLAY USING GT_ORDER_ALV[] GC_GRID_100.
+
+ENDMODULE.
+*&---------------------------------------------------------------------*
+*&      Module  SET_ALV_200  OUTPUT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+MODULE set_alv_200 OUTPUT.
+  PERFORM CREATE_OBJECT USING GC_DOCKING GC_GRID_200.
+  PERFORM ALV_FIELDCAT_200.
+  PERFORM ALV_LAYOUT.
+  PERFORM ALV_SORT.
+  PERFORM ALV_DISPLAY USING GT_DLVRY_ALV[] GC_GRID_200.
+ENDMODULE.
+
+----------------------------------------------------------------------------------
+Extracted by Mass Download version 1.4.6 - E.G.Mellodew. 1998-2025. Sap Release 750

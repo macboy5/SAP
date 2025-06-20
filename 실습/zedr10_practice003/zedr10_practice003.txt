@@ -1,0 +1,424 @@
+*&---------------------------------------------------------------------*
+*& Report ZEDR10_PRACTICE003
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZEDR10_PRACTICE003.
+
+"   ZEDT10_100
+TABLES : ZEDT10_100.
+
+DATA : BEGIN OF GS_ORDER.
+  INCLUDE TYPE ZEDT10_100.
+DATA : END OF GS_ORDER.
+DATA : GT_ORDER LIKE TABLE OF GS_ORDER.
+
+"   ZEDT10_101
+TABLES : ZEDT10_101.
+
+DATA : BEGIN OF GS_DLVRY.
+  INCLUDE TYPE ZEDT10_101.
+DATA : END OF GS_DLVRY.
+DATA : GT_DLVRY LIKE TABLE OF GS_DLVRY.
+
+"   #### ###
+DATA : BEGIN OF GS_WRITE1.
+  INCLUDE TYPE ZEDT10_100.
+  DATA : P_TYPE TYPE C LENGTH 6,
+        PRICE1 TYPE I,
+        PRICE2 TYPE I,
+        PRICE3 TYPE I,
+        SALE_TYPE TYPE C LENGTH 6,
+        SELL_TYPE TYPE C LENGTH 6,
+        RETURNS_TYPE TYPE C LENGTH 8.
+DATA : END OF GS_WRITE1.
+DATA : GT_WRITE1 LIKE TABLE OF GS_WRITE1.
+
+"   #### ###
+DATA : BEGIN OF GS_WRITE2.
+  INCLUDE TYPE ZEDT10_101.
+  DATA : P_TYPE TYPE C LENGTH 6,
+        PRICE1 TYPE I,
+        DLVRY_POS TYPE C LENGTH 8,
+        REGION TYPE C LENGTH 6.
+DATA : END OF GS_WRITE2.
+DATA : GT_WRITE2 LIKE TABLE OF GS_WRITE2.
+
+CONSTANTS : C_RATE TYPE I VALUE 100.
+
+
+SELECTION-SCREEN BEGIN OF BLOCK B1 WITH FRAME.
+
+"   ####
+SELECT-OPTIONS : S_ZORDNO FOR ZEDT10_100-ZORDNO.
+"   ##ID
+SELECT-OPTIONS: S_ZID FOR ZEDT10_100-ZIDCODE NO INTERVALS NO-EXTENSION.
+"   ####
+SELECT-OPTIONS : S_ZMATNR FOR ZEDT10_100-ZMATNR.
+"   ####
+SELECT-OPTIONS : S_ZJDATE FOR ZEDT10_100-ZJDATE MODIF ID M1.
+"   ####
+SELECT-OPTIONS : S_ZDDATE FOR ZEDT10_101-ZDDATE MODIF ID M2.
+
+SELECTION-SCREEN END OF BLOCK B1.
+
+
+
+SELECTION-SCREEN BEGIN OF BLOCK B2 WITH FRAME.
+
+"   ####
+PARAMETERS : P_ORDER RADIOBUTTON GROUP R1 DEFAULT 'X' USER-COMMAND UC1.
+"   ####
+PARAMETERS : P_DLVRY RADIOBUTTON GROUP R1.
+
+SELECTION-SCREEN END OF BLOCK B2.
+
+
+
+SELECTION-SCREEN BEGIN OF BLOCK B3 WITH FRAME.
+
+"   ######
+PARAMETERS : P_BAKLST AS CHECKBOX DEFAULT 'X'.
+
+SELECTION-SCREEN END OF BLOCK B3.
+
+
+INITIALIZATION.
+S_ZJDATE-LOW = SY-DATUM(6) && '01'.
+
+"   #### ###
+IF SY-DATUM+4(2) = '01' OR SY-DATUM+4(2) = '03' OR SY-DATUM+4(2) = '05' OR
+  SY-DATUM+4(2) = '07' OR SY-DATUM+4(2) = '08' OR SY-DATUM+4(2) = '10' OR
+  SY-DATUM+4(2) = '12'.
+  S_ZJDATE-HIGH = SY-DATUM(6) && '31'.
+ELSEIF SY-DATUM+4(2) = '02'.
+  S_ZJDATE-HIGH = SY-DATUM(6) && '28'.
+ELSE.
+  S_ZJDATE-HIGH = SY-DATUM(6) && '30'.
+ENDIF.
+S_ZJDATE-SIGN = 'I'.
+S_ZJDATE-OPTION = 'BT'.
+
+APPEND S_ZJDATE.
+
+"   #### ###
+S_ZDDATE-LOW = SY-DATUM(6) && '01'.
+IF SY-DATUM+4(2) = '01' OR SY-DATUM+4(2) = '03' OR SY-DATUM+4(2) = '05' OR
+  SY-DATUM+4(2) = '07' OR SY-DATUM+4(2) = '08' OR SY-DATUM+4(2) = '10' OR
+  SY-DATUM+4(2) = '12'.
+  S_ZDDATE-HIGH = SY-DATUM(6) && '31'.
+ELSEIF SY-DATUM+4(2) = '02'.
+  S_ZDDATE-HIGH = SY-DATUM(6) && '28'.
+ELSE.
+  S_ZDDATE-HIGH = SY-DATUM(6) && '30'.
+ENDIF.
+S_ZDDATE-SIGN = 'I'.
+S_ZDDATE-OPTION = 'BT'.
+
+APPEND S_ZDDATE.
+
+AT SELECTION-SCREEN OUTPUT.
+  LOOP AT SCREEN.
+    IF SCREEN-GROUP1 = 'M1'.
+      IF P_ORDER = 'X'.
+        SCREEN-ACTIVE = '1'.
+      ELSE.
+        SCREEN-ACTIVE = '0'.
+      ENDIF.
+    ELSEIF SCREEN-GROUP1 = 'M2'.
+      IF P_DLVRY = 'X'.
+        SCREEN-ACTIVE = '1'.
+      ELSE.
+        SCREEN-ACTIVE = '0'.
+      ENDIF.
+    ENDIF.
+    MODIFY SCREEN.
+ENDLOOP.
+
+
+
+
+START-OF-SELECTION.
+  PERFORM GET_DATA.
+  PERFORM MODIFY_DATA.
+
+END-OF-SELECTION.
+  PERFORM WRITE_DATA.
+
+
+
+
+
+
+FORM GET_DATA.
+  SELECT * FROM ZEDT10_100
+    INTO CORRESPONDING FIELDS OF TABLE GT_ORDER
+    WHERE ZORDNO IN S_ZORDNO AND
+    ZIDCODE IN S_ZID AND
+    ZMATNR IN S_ZMATNR  AND
+    ZJDATE IN S_ZJDATE.
+
+
+"   RANGE ## ### ##
+RANGES GR_DLVRY FOR ZEDT10_101-ZFLAG.
+
+GR_DLVRY-SIGN = 'I'.
+GR_DLVRY-OPTION = 'EQ'.
+
+IF P_BAKLST = 'X'.
+  GR_DLVRY-LOW = 'X'.
+ELSE.
+  GR_DLVRY-LOW = ' ' .
+ENDIF.
+
+
+  SELECT * FROM ZEDT10_101
+    INTO CORRESPONDING FIELDS OF TABLE GT_DLVRY
+    WHERE ZORDNO IN S_ZORDNO AND
+    ZIDCODE IN S_ZID AND
+    ZMATNR IN S_ZMATNR  AND
+    ZDDATE IN S_ZDDATE AND
+    ZFLAG IN GR_DLVRY.
+
+ENDFORM.
+
+
+FORM MODIFY_DATA.
+
+"   ## ##
+LOOP AT GT_ORDER INTO GS_ORDER.
+
+  CLEAR : GS_WRITE1.
+
+  MOVE-CORRESPONDING GS_ORDER TO GS_WRITE1.
+
+  IF GS_WRITE1-ZMTART = '001'.
+    GS_WRITE1-P_TYPE = '##'.
+  ELSEIF GS_WRITE1-ZMTART = '002'.
+    GS_WRITE1-P_TYPE = '##'.
+  ELSEIF GS_WRITE1-ZMTART = '003'.
+    GS_WRITE1-P_TYPE = '##'.
+  ELSEIF GS_WRITE1-ZMTART = '004'.
+    GS_WRITE1-P_TYPE = '##'.
+  ELSEIF GS_WRITE1-ZMTART = '005'.
+    GS_WRITE1-P_TYPE = '##'.
+   ELSEIF GS_WRITE1-ZMTART = '006'.
+    GS_WRITE1-P_TYPE = '###'.
+  ENDIF.
+
+  IF GS_WRITE1-ZDC_FG = '1'.
+    GS_WRITE1-SALE_TYPE = '#####'.
+  ELSEIF GS_WRITE1-ZDC_FG = '2'.
+   GS_WRITE1-SALE_TYPE = '######'.
+  ELSEIF GS_WRITE1-ZDC_FG = '3'.
+    GS_WRITE1-SALE_TYPE = '####'.
+  ELSEIF GS_WRITE1-ZDC_FG = '4'.
+    GS_WRITE1-SALE_TYPE = '####'.
+  ENDIF.
+
+  IF GS_WRITE1-ZSALE_FG = '1'.
+    GS_WRITE1-SELL_TYPE = '##'.
+  ELSEIF GS_WRITE1-ZSALE_FG = '2'.
+    GS_WRITE1-SELL_TYPE = '##'.
+  ENDIF.
+
+   IF GS_WRITE1-ZRET_FG = '1'.
+    GS_WRITE1-RETURNS_TYPE = '####'.
+   ELSEIF GS_WRITE1-ZRET_FG = '2'.
+    GS_WRITE1-RETURNS_TYPE = '####'.
+   ELSEIF GS_WRITE1-ZRET_FG = '3'.
+    GS_WRITE1-RETURNS_TYPE = '####'.
+   ENDIF.
+
+
+   GS_WRITE1-PRICE1 = GS_WRITE1-ZNSAMT * C_RATE.
+   GS_WRITE1-PRICE2 = GS_WRITE1-ZSLAMT * C_RATE.
+   GS_WRITE1-PRICE3 = GS_WRITE1-ZDCAMT * C_RATE.
+
+  APPEND GS_WRITE1 TO GT_WRITE1.
+
+ENDLOOP.
+
+"   ## ##
+LOOP AT GT_DLVRY INTO GS_DLVRY.
+
+   CLEAR : GS_WRITE2.
+
+   MOVE-CORRESPONDING GS_DLVRY TO GS_WRITE2.
+
+  IF GS_WRITE2-ZMTART = '001'.
+    GS_WRITE2-P_TYPE = '##'.
+  ELSEIF GS_WRITE2-ZMTART = '002'.
+    GS_WRITE2-P_TYPE = '##'.
+  ELSEIF GS_WRITE2-ZMTART = '003'.
+    GS_WRITE2-P_TYPE = '##'.
+  ELSEIF GS_WRITE2-ZMTART = '004'.
+    GS_WRITE2-P_TYPE = '##'.
+  ELSEIF GS_WRITE2-ZMTART = '005'.
+    GS_WRITE2-P_TYPE = '##'.
+   ELSEIF GS_WRITE2-ZMTART = '006'.
+    GS_WRITE2-P_TYPE = '###'.
+  ENDIF.
+
+  IF GS_WRITE2-ZDFLAG = '1'.
+    GS_WRITE2-DLVRY_POS ='####'.
+  ELSEIF GS_WRITE2-ZDFLAG = '2'.
+    GS_WRITE2-DLVRY_POS ='###'.
+  ELSEIF GS_WRITE2-ZDFLAG = '3'.
+    GS_WRITE2-DLVRY_POS ='####'.
+  ENDIF.
+
+*  BREAK-POINT.
+
+   IF GS_WRITE2-ZDGUBUN = '1'.
+    GS_WRITE2-REGION ='###'.
+   ELSEIF GS_WRITE2-ZDGUBUN = '2'.
+    GS_WRITE2-REGION ='###'.
+   ELSEIF GS_WRITE2-ZDGUBUN = '3'.
+    GS_WRITE2-REGION ='###'.
+   ELSEIF GS_WRITE2-ZDGUBUN = '4'.
+    GS_WRITE2-REGION ='###'.
+   ELSEIF GS_WRITE2-ZDGUBUN = '5'.
+    GS_WRITE2-REGION ='###'.
+   ELSEIF GS_WRITE2-ZDGUBUN = '6'.
+    GS_WRITE2-REGION ='###'.
+   ELSEIF GS_WRITE2-ZDGUBUN = '7'.
+    GS_WRITE2-REGION ='###'.
+   ENDIF.
+
+   GS_WRITE2-PRICE1 = GS_WRITE2-ZSLAMT * C_RATE.
+
+    APPEND GS_WRITE2 TO GT_WRITE2.
+
+
+ENDLOOP.
+
+
+
+
+ENDFORM.
+
+
+
+FORM WRITE_DATA.
+
+"   ## ## ##
+IF P_ORDER = 'X'.
+
+  IF P_BAKLST = 'X'.
+
+    LOOP AT GT_WRITE1 INTO GS_WRITE1.
+      AT FIRST.
+        WRITE : / '--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------'.
+        WRITE : / '|  ####  |     ID     |  ####  |        ###        | #### |## |## |  ####   |  ####   |  ####   |  ##  |  ####  |  ####  |  ####  |'.
+        WRITE : / '--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------'.
+      ENDAT.
+
+      IF GS_WRITE1-ZRDATE IS NOT INITIAL.
+      WRITE : / '|', GS_WRITE1-ZORDNO,'|', GS_WRITE1-ZIDCODE,'|', GS_WRITE1-ZMATNR, '|', GS_WRITE1-ZMATNAME, '| ', GS_WRITE1-P_TYPE,  ' |',GS_WRITE1-ZVOLUM, '|', GS_WRITE1-VRKME, '|',
+       GS_WRITE1-PRICE1,  '|', GS_WRITE1-PRICE2, '|', GS_WRITE1-PRICE3, '|',GS_WRITE1-SELL_TYPE, '|', GS_WRITE1-ZJDATE, '|', GS_WRITE1-RETURNS_TYPE, '  |', GS_WRITE1-ZRDATE, '|'.
+      ELSE.
+       WRITE : / '|', GS_WRITE1-ZORDNO,'|', GS_WRITE1-ZIDCODE,'|', GS_WRITE1-ZMATNR, '|', GS_WRITE1-ZMATNAME, '| ', GS_WRITE1-P_TYPE,  ' |',GS_WRITE1-ZVOLUM, '|', GS_WRITE1-VRKME, '|',
+       GS_WRITE1-PRICE1,  '|', GS_WRITE1-PRICE2, '|', GS_WRITE1-PRICE3, '|',GS_WRITE1-SELL_TYPE, '|', GS_WRITE1-ZJDATE, '|', GS_WRITE1-RETURNS_TYPE, '  |',  '           |'.
+      ENDIF.
+       WRITE : / '--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------'.
+
+    ENDLOOP.
+
+  ELSE.
+
+    LOOP AT GT_WRITE1 INTO GS_WRITE1.
+      AT FIRST.
+        WRITE : / '------------------------------------------------------------------------------------------------------------------------------------------------------'.
+        WRITE : / '|  ####  |     ID     |  ####  |        ###        | #### |## |## |  ####   |  ####   |  ####   |  ##  |  ####  |'.
+        WRITE : / '------------------------------------------------------------------------------------------------------------------------------------------------------'.
+      ENDAT.
+
+      IF GS_WRITE1-ZSALE_FG = 1.
+      WRITE : / '|', GS_WRITE1-ZORDNO,'|', GS_WRITE1-ZIDCODE,'|', GS_WRITE1-ZMATNR, '|', GS_WRITE1-ZMATNAME, '| ', GS_WRITE1-P_TYPE,  ' |',GS_WRITE1-ZVOLUM, '|', GS_WRITE1-VRKME, '|',
+       GS_WRITE1-PRICE1,  '|', GS_WRITE1-PRICE2, '|', GS_WRITE1-PRICE3, '|',GS_WRITE1-SELL_TYPE, '|', GS_WRITE1-ZJDATE, '|'.
+       WRITE : / '------------------------------------------------------------------------------------------------------------------------------------------------------'.
+     ENDIF.
+
+    ENDLOOP.
+
+
+  ENDIF.
+
+
+"   ## ## ##
+
+ELSEIF P_DLVRY = 'X'.
+
+  CLEAR : GS_WRITE2.
+
+  " ######
+
+  IF P_BAKLST = 'X'.
+
+    LOOP AT GT_WRITE2 INTO GS_WRITE2.
+
+      AT FIRST.
+        WRITE : / '--------------------------------------------------------------------------------------------------------------------------------------------------'.
+        WRITE : / '|  ####  |     ID     |  ####  |        ###        | #### |## |## |  ####   | #### |  ##  |  ####  |  ####  |'.
+        WRITE : / '--------------------------------------------------------------------------------------------------------------------------------------------------'.
+      ENDAT.
+
+      IF GS_WRITE2-ZRDATE IS NOT INITIAL.
+
+      WRITE : / '|', GS_WRITE2-ZORDNO,'|', GS_WRITE2-ZIDCODE,'|', GS_WRITE2-ZMATNR, '|', GS_WRITE2-ZMATNAME, '| ', GS_WRITE2-P_TYPE,  ' |',GS_WRITE2-ZVOLUM, '|', GS_WRITE2-VRKME, '|',
+       GS_WRITE2-PRICE1,  '|',GS_WRITE2-DLVRY_POS, '|', GS_WRITE2-REGION, '|', GS_WRITE2-ZDDATE, '|', GS_WRITE2-ZRDATE, '|'.
+      ELSE.
+       WRITE : / '|', GS_WRITE2-ZORDNO,'|', GS_WRITE2-ZIDCODE,'|', GS_WRITE2-ZMATNR, '|', GS_WRITE2-ZMATNAME, '| ', GS_WRITE2-P_TYPE,  ' |',GS_WRITE2-ZVOLUM, '|', GS_WRITE2-VRKME, '|',
+       GS_WRITE2-PRICE1,  '|',GS_WRITE2-DLVRY_POS, '|', GS_WRITE2-REGION, '|', GS_WRITE2-ZDDATE, '|', '           |'.
+      ENDIF.
+
+       WRITE : / '--------------------------------------------------------------------------------------------------------------------------------------------------'.
+
+      CLEAR : GS_WRITE2.
+    ENDLOOP.
+
+
+" #### ###
+  ELSE.
+
+      LOOP AT GT_WRITE2 INTO GS_WRITE2.
+
+      AT FIRST.
+        WRITE : / '-------------------------------------------------------------------------------------------------------------------------------------'.
+        WRITE : / '|  ####  |     ID     |  ####  |        ###        | #### |## |## |  ####   | #### |  ##  |  ####  |'.
+        WRITE : / '-------------------------------------------------------------------------------------------------------------------------------------'.
+      ENDAT.
+
+      IF GS_WRITE2-ZFLAG IS INITIAL.
+
+      WRITE : / '|', GS_WRITE2-ZORDNO,'|', GS_WRITE2-ZIDCODE,'|', GS_WRITE2-ZMATNR, '|', GS_WRITE2-ZMATNAME, '| ', GS_WRITE2-P_TYPE,  ' |',GS_WRITE2-ZVOLUM, '|', GS_WRITE2-VRKME, '|',
+       GS_WRITE2-PRICE1,  '|',GS_WRITE2-DLVRY_POS, '|', GS_WRITE2-REGION, '|', GS_WRITE2-ZDDATE, '|'.
+       WRITE : / '-------------------------------------------------------------------------------------------------------------------------------------'.
+
+     ENDIF.
+
+      CLEAR : GS_WRITE2.
+    ENDLOOP.
+
+  ENDIF.
+
+
+ENDIF.
+
+ENDFORM.
+
+
+*Selection texts
+*----------------------------------------------------------
+* P_BAKLST         ######
+* P_DLVRY         ####
+* P_ORDER         ####
+* S_ZDDATE         ####
+* S_ZID         ##ID
+* S_ZJDATE         ####
+* S_ZMATNR         ####
+* S_ZORDNO         ####
+
+----------------------------------------------------------------------------------
+Extracted by Mass Download version 1.4.6 - E.G.Mellodew. 1998-2025. Sap Release 750

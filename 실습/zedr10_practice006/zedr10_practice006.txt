@@ -1,0 +1,41 @@
+*&---------------------------------------------------------------------*
+*& Report ZEDR10_PRACTICE006
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZEDR10_PRACTICE006.
+
+
+
+DATA: lv_currency TYPE string,
+      lv_amount   TYPE p DECIMALS 2,
+      lv_krw      TYPE p DECIMALS 2.
+
+*lv_currency = 'USD'.
+*lv_amount   = 100.
+
+lv_currency = 'JPY'.
+lv_amount   = 57.
+
+" ## ##( ## TO ## ) ####
+" #### ### # #### ##### KRW #### #### ##.
+CALL FUNCTION 'ZED10_EXCHANGE_RATE_TO_KRW'
+  EXPORTING
+    iv_currency = lv_currency
+    iv_amount   = lv_amount
+  IMPORTING
+    ev_krw      = lv_krw
+  EXCEPTIONS
+    unknown_currency = 1
+    OTHERS           = 2.
+
+IF sy-subrc = 0.
+  WRITE: / lv_amount, lv_currency, 'TO', lv_krw, 'KRW'.
+ELSEIF sy-subrc = 1.
+  WRITE: / '#### ## #####:', lv_currency.
+ELSE.
+  WRITE: / '# # ## ## ##'.
+ENDIF.
+
+----------------------------------------------------------------------------------
+Extracted by Mass Download version 1.4.6 - E.G.Mellodew. 1998-2025. Sap Release 750

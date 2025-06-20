@@ -1,0 +1,68 @@
+*&---------------------------------------------------------------------*
+*& Report ZEDR10_PRACTICE009
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZEDR10_PRACTICE009 MESSAGE-ID ZMED10.
+
+INCLUDE ZEDR10_PRACTICE009_TOP.
+INCLUDE ZEDR10_PRACTICE009_SCR.
+INCLUDE ZEDR10_PRACTICE009_F01.
+INCLUDE ZEDR10_PRACTICE009_PBO.
+INCLUDE ZEDR10_PRACTICE009_PAI.
+
+INITIALIZATION.
+  PERFORM SET_INIT.
+
+AT SELECTION-SCREEN OUTPUT.
+  PERFORM SET_SCREEN.
+
+START-OF-SELECTION.
+  PERFORM CHECK_SCREEN.
+  PERFORM GET_DATA.
+  PERFORM MODIFY_DATA.
+
+*  BREAK-POINT.
+
+  IF R_ORDER = 'X'.
+    IF GT_ORDER[] IS NOT INITIAL.
+      CALL SCREEN 100.
+    ELSE.
+      MESSAGE I001.
+      EXIT.
+    ENDIF.
+  ELSEIF R_DLVRY = 'X'.
+    IF GT_DLVRY[] IS NOT INITIAL.
+      CALL SCREEN 200.
+    ELSE.
+      MESSAGE I001.
+      EXIT.
+    ENDIF.
+  ENDIF.
+
+*GUI Texts
+*----------------------------------------------------------
+* T100 --> #### ###
+
+
+*Selection texts
+*----------------------------------------------------------
+* P_CHK         ######
+* R_DLVRY         ####
+* R_ORDER         ####
+* S_ZDDATE         ####
+* S_ZID         ##ID
+* S_ZJDATE         ####
+* S_ZMATNR         ####
+* S_ZORDNO         ####
+
+
+*Messages
+*----------------------------------------------------------
+*
+* Message class: ZMED10
+*000   ##### ######
+*001   ### #### ####
+
+----------------------------------------------------------------------------------
+Extracted by Mass Download version 1.4.6 - E.G.Mellodew. 1998-2025. Sap Release 750

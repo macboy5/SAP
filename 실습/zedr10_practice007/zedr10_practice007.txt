@@ -1,0 +1,842 @@
+*&---------------------------------------------------------------------*
+*& Report ZEDR10_PRACTICE007
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT zedr10_practice007 MESSAGE-ID zmed10.
+
+DATA : tmp_date TYPE sy-datum.
+
+TABLES : zedt10_102.
+
+RANGES : RG_FLAG FOR ZEDT10_102-ZQFLAG.
+
+DATA : GS_FIELDCAT TYPE SLIS_FIELDCAT_ALV.
+DATA : GT_FIELDCAT TYPE SLIS_T_FIELDCAT_ALV.
+
+DATA : GS_LAYOUT_EMP TYPE SLIS_LAYOUT_ALV.
+
+DATA : GS_FIELDCAT_R TYPE SLIS_FIELDCAT_ALV.
+DATA : GT_FIELDCAT_R TYPE SLIS_T_FIELDCAT_ALV.
+
+DATA : GS_LAYOUT_R TYPE SLIS_LAYOUT_ALV.
+
+
+
+DATA : BEGIN OF gs_employee,             "####### ###
+         zpernr    LIKE zedt10_102-zpernr,    "####
+         zpname    LIKE zedt10_103-zpname,    "####
+         zdepcode  LIKE zedt10_102-zdepcode,  "####
+         zedate    LIKE zedt10_102-zedate,     "####
+         ZQFLAG    LIKE zedt10_102-ZQFLAG,      "####
+         zgender   LIKE zedt10_103-zgender,    "##
+         zaddress  LIKE zedt10_103-zaddress,  "##
+         zbankcode LIKE zedt10_106-zbankcode,  "####
+         zaccount  LIKE zedt10_106-zaccount,   "####
+         ZDEPRANK LIKE ZEDT10_102-ZDEPRANK,
+       END OF gs_employee.
+DATA : gt_employee LIKE TABLE OF gs_employee.
+
+DATA : BEGIN OF gs_salary,      "   #### ###
+         zpernr  LIKE zedt10_102-zpernr,    "####
+         ZEDATE  LIKE ZEDT10_102-ZEDATE,      " ###
+         zqdate  LIKE zedt10_102-zqdate,      "###
+         ZQFLAG  LIKE zedt10_102-zqfLAg,      "####
+         zsalary LIKE zedt10_106-zsalary,    "####
+         zrank   LIKE zedt10_104-zrank,        "####
+         zmon    LIKE zedt10_105-zmon01,        "##
+       END OF gs_salary.
+DATA : gt_salary LIKE TABLE OF gs_salary.
+
+DATA : BEGIN OF gs_rank,          " #### ###
+         zpernr   LIKE zedt10_102-zpernr,    "####
+         zpname   LIKE zedt10_103-zpname,    "####
+         zdepcode LIKE zedt10_102-zdepcode,  "####
+         zdeprank LIKE zedt10_102-zdeprank,  "####
+         zedate   LIKE zedt10_102-zedate,     "###
+         zqdate  LIKE zedt10_102-zqdate,      "###
+         ZQFLAG  LIKE zedt10_102-zqfLAg,      "####
+         zsalary  LIKE zedt10_106-zsalary,    "####
+         zrank    LIKE zedt10_104-zrank,        "####
+       END OF gs_rank.
+DATA : gt_rank LIKE TABLE OF gs_rank.
+
+DATA : BEGIN OF gs_employee_alv,        " ####### ALV ###
+         zpernr    LIKE zedt10_102-zpernr,    "####
+         zpname    LIKE zedt10_103-zpname,    "####
+         zdepcode  LIKE zedt10_102-zdepcode,  "####
+         zdepname  TYPE c LENGTH 10,        "###
+         zrankname TYPE c LENGTH 10,       "###
+         zedate    LIKE zedt10_102-zedate,     "###
+         ZQSTATE TYPE C LENGTH 10,             "####
+         zgender   LIKE zedt10_103-zgender,    "##
+         zaddress  LIKE zedt10_103-zaddress,  "##
+         zbankcode LIKE zedt10_106-zbankcode,  "####
+         zbankname TYPE c LENGTH 10,         "###
+         zaccount  LIKE zedt10_106-zaccount,   "####
+       END OF gs_employee_alv.
+DATA : gt_employee_alv LIKE TABLE OF gs_employee_alv.
+
+DATA : BEGIN OF gs_rank_alv,     " #### ALV ###
+         zpernr    LIKE zedt10_102-zpernr,    "####
+         zpname    LIKE zedt10_103-zpname,    "####
+         zdepcode  LIKE zedt10_102-zdepcode,  "####
+         zdepname  TYPE c LENGTH 10,        "###
+         zrankname TYPE c LENGTH 10,       "###
+         zedate    LIKE zedt10_102-zedate,     "###
+         zsalary   LIKE zedt10_106-zsalary,    "####
+         zrank     LIKE zedt10_104-zrank,        "####
+         zmon      LIKE zedt10_105-zmon01,        "##
+       END OF gs_rank_alv.
+DATA : gt_Rank_alv LIKE TABLE OF gs_rank_alv.
+
+
+
+SELECTION-SCREEN BEGIN OF BLOCK b1 WITH FRAME.
+
+SELECT-OPTIONS : s_zpernr FOR zedt10_102-zpernr.            "####
+SELECT-OPTIONS : s_date FOR sy-datum NO-EXTENSION MODIF ID m1.          "##
+PARAMETERS: p_year LIKE sy-datum(4) DEFAULT sy-datum(4) MODIF ID m2.    "##
+PARAMETERS: p_month(2) DEFAULT sy-datum+4(2) MODIF ID m2.                "#
+SELECT-OPTIONS : S_decode FOR zedt10_102-zdepcode MODIF ID m1.     "####
+
+SELECTION-SCREEN END OF BLOCK b1.
+
+SELECTION-SCREEN BEGIN OF BLOCK b2 WITH FRAME.
+
+PARAMETERS : r_btn1 RADIOBUTTON GROUP r1 DEFAULT 'X' USER-COMMAND uc1.
+PARAMETERS : r_btn2 RADIOBUTTON GROUP r1.
+PARAMETERS : r_btn3 RADIOBUTTON GROUP r1.
+
+SELECTION-SCREEN END OF BLOCK b2.
+
+SELECTION-SCREEN BEGIN OF BLOCK b3 WITH FRAME.
+PARAMETERS : p_chk1 AS CHECKBOX DEFAULT 'X' MODIF ID m1.
+SELECTION-SCREEN END OF BLOCK b3.
+
+
+
+INITIALIZATION.
+  CONCATENATE sy-datum(4) '01' '01' INTO s_date-low.
+  CALL FUNCTION 'LAST_DAY_OF_MONTHS'
+    EXPORTING
+      day_in            = sy-datum
+    IMPORTING
+      last_day_of_month = s_date-high.
+*   EXCEPTIONS
+*     DAY_IN_NO_DATE          = 1
+*     OTHERS                  = 2
+  .
+  IF sy-subrc <> 0.
+* Implement suitable error handling here
+  ENDIF.
+
+  APPEND s_date.
+
+
+  "   ### ##
+
+AT SELECTION-SCREEN OUTPUT.
+  PERFORM set_screen.
+
+
+START-OF-SELECTION.
+  "   CHECK SCREEN
+  PERFORM check_screen.
+
+  "   GET DATA
+  PERFORM get_data.
+
+  "    MODIFY DATA
+  PERFORM MODIFY_data.
+
+END-OF-SELECTION.
+  "    DISPLAY ALV
+  PERFORM display_alv.
+
+
+
+
+
+FORM set_screen.
+  LOOP AT SCREEN.
+    IF r_btn1 = 'X'.
+      IF screen-group1 = 'M2'.
+        screen-active = '0'.
+      ENDIF.
+    ELSE.
+      IF screen-group1 = 'M1'.
+        screen-active = '0'.
+      ENDIF.
+    ENDIF.
+
+    MODIFY SCREEN.
+
+  ENDLOOP.
+ENDFORM.
+
+FORM check_screen.
+  IF r_btn1 = 'X'.
+    IF s_date-low IS INITIAL AND s_date-high IS INITIAL.
+      MESSAGE i000.
+      STOP.
+    ENDIF.
+  ELSE.
+    IF p_year IS INITIAL OR p_month IS INITIAL.
+      MESSAGE i000.
+      STOP.
+    ENDIF.
+  ENDIF.
+ENDFORM.
+
+FORM get_data.
+  IF r_btn1 = 'X'.  " ####
+    PERFORM get_employee.
+  ELSEIF r_btn2 = 'X'.  " ####
+    PERFORM get_salary.
+  ELSEIF r_btn3 = 'X'.  " ####
+    PERFORM get_rank.
+  ENDIF.
+ENDFORM.
+
+"   ZEDT10_102, ZEDT10_103
+FORM get_employee.
+
+   CLEAR RG_FLAG.
+
+   IF P_CHK1 = 'X'.
+     RG_FLAG-SIGN = 'I'.
+     RG_FLAG-OPTION = 'EQ'.
+     RG_FLAG-LOW = ' '.
+     APPEND RG_FLAG.
+   ELSE.
+     RG_FLAG-SIGN = 'I'.
+     RG_FLAG-OPTION = 'BT'.
+     RG_FLAG-HIGH = 'X'.
+     APPEND RG_FLAG.
+*    RG_FLAG-SIGN = 'I'.
+*    RG_FLAG-OPTION = 'EQ'.
+*    RG_FLAG-LOW = ' '.
+*    APPEND RG_FLAG.
+*    RG_FLAG-LOW = 'X'.
+*    APPEND RG_FLAG.
+   ENDIF.
+
+
+  SELECT a~zpernr  a~zDEPCODE a~zedate A~ZQFLAG A~ZDEPRANK
+         b~zpname b~zgender b~zaddress
+         C~ZBANKCODE C~ZACCOUNT
+    INTO CORRESPONDING FIELDS OF TABLE GT_EMPLOYEE
+    FROM zedt10_102 AS a
+    INNER JOIN zedt10_103 AS b
+    ON a~zpernr = b~zpernr
+    INNER JOIN ZEDT10_106 AS C
+    ON A~ZPERNR = C~ZPERNR
+    WHERE A~ZPERNR IN S_ZPERNR AND
+    A~DATBI <= S_DATE-HIGH AND
+    A~DATAB > S_DATE-HIGH AND
+    A~ZDEPCODE IN S_DECODE AND
+    A~ZQFLAG IN RG_FLAG.
+
+ENDFORM.
+
+"   ZEDT10_105, ZEDT10_106
+FORM get_salary.
+
+  DATA : LV_DATE LIKE ZEDT00_102-DATBI.
+  CLEAR : LV_DATE.
+  CONCATENATE P_YEAR P_MONTH '01' INTO LV_DATE.
+
+SELECT A~ZPERNR A~ZEDATE A~ZQDATE A~ZQFLAG
+       C~ZSALARY
+       B~ZRANK
+       INTO CORRESPONDING FIELDS OF TABLE GT_SALARY
+       FROM ZEDT10_102 AS A
+       INNER JOIN ZEDT10_104 AS B
+       ON A~ZPERNR = B~ZPERNR
+       INNER JOIN ZEDT10_106 AS C
+       ON A~ZPERNR = C~ZPERNR
+       WHERE A~ZPERNR IN S_ZPERNR AND
+       B~ZYEAR = P_YEAR AND
+       C~ZYEAR = P_YEAR AND
+       B~DATBI <= LV_DATE.
+
+
+ENDFORM.
+
+"   ZEDT10_104
+FORM get_rank.
+
+  DATA : LV_DATE LIKE ZEDT00_102-DATBI.
+  CLEAR : LV_DATE.
+  CONCATENATE P_YEAR P_MONTH '01' INTO LV_DATE.
+
+SELECT A~ZPERNR A~ZDEPCODE A~ZDEPRANK A~ZEDATE A~ZQDATE A~ZQFLAG
+       B~ZPNAME
+       C~ZRANK
+       D~ZSALARY
+       INTO CORRESPONDING FIELDS OF TABLE GT_RANK
+       FROM ZEDT10_102 AS A
+       INNER JOIN ZEDT10_103 AS B
+       ON A~ZPERNR = B~ZPERNR
+       INNER JOIN ZEDT10_104 AS C
+       ON A~ZPERNR = C~ZPERNR
+       INNER JOIN ZEDT10_106 AS D
+       ON A~ZPERNR = D~ZPERNR
+       WHERE A~ZPERNR IN S_ZPERNR AND
+       C~ZYEAR = P_YEAR AND
+       D~ZYEAR = P_YEAR AND
+       A~ZEDATE <= LV_DATE.
+
+
+ENDFORM.
+
+FORM MODIFY_data.
+
+    IF r_btn1 = 'X'.  " ####
+    PERFORM MODIFY_employee.
+  ELSEIF r_btn2 = 'X'.  " ####
+    PERFORM MODIFY_salary.
+    PERFORM UPDATE_SALARY.
+  ELSEIF r_btn3 = 'X'.  " ####
+    PERFORM MODIFY_rank.
+  ENDIF.
+
+ENDFORM.
+
+FORM MODIFY_EMPLOYEE.
+
+  LOOP AT GT_EMPLOYEE INTO GS_EMPLOYEE.
+
+    MOVE-CORRESPONDING GS_EMPLOYEE TO GS_EMPLOYEE_ALV.
+
+    " ###
+    PERFORM TRANSFORM_DEPCODE USING GS_EMPLOYEE-ZDEPCODE
+                              CHANGING GS_EMPLOYEE_ALV-ZDEPNAME.
+
+    " ###
+    PERFORM TRANSFORM_DEPRANK USING GS_EMPLOYEE-ZDEPRANK
+                              CHANGING GS_EMPLOYEE_ALV-ZRANKNAME.
+
+    " ####
+    IF GS_EMPLOYEE-ZQFLAG = 'X'.
+      GS_EMPLOYEE_ALV-ZQSTATE = '##'.
+    ELSE.
+      GS_EMPLOYEE_ALV-ZQSTATE = '##'.
+    ENDIF.
+
+    " ##
+    IF GS_EMPLOYEE-ZGENDER = 'M'.
+      GS_EMPLOYEE_ALV-ZGENDER = '##'.
+    ELSEIF GS_EMPLOYEE-ZGENDER = 'F'.
+      GS_EMPLOYEE_ALV-ZGENDER = '##'.
+    ENDIF.
+
+    " ###
+
+    PERFORM TRANSFORM_BANKCODE USING GS_EMPLOYEE-ZBANKCODE
+                              CHANGING GS_EMPLOYEE_ALV-ZBANKNAME.
+
+    APPEND GS_EMPLOYEE_ALV TO GT_EMPLOYEE_ALV.
+
+  ENDLOOP.
+
+
+ENDFORM.
+
+FORM TRANSFORM_DEPCODE USING DEPCODE CHANGING DEPNAME.
+
+  CASE DEPCODE.
+    WHEN 'SS0001'.
+      DEPNAME = '###'.
+    WHEN 'SS0002'.
+      DEPNAME = '###'.
+    WHEN 'SS0003'.
+      DEPNAME = '###'.
+    WHEN 'SS0004'.
+      DEPNAME = '###'.
+    WHEN 'SS0005'.
+      DEPNAME = '###'.
+    WHEN 'SS0006'.
+      DEPNAME = '###'.
+  ENDCASE.
+
+ENDFORM.
+
+FORM TRANSFORM_DEPRANK USING DEPRANK CHANGING DEPRANKNAME.
+
+  CASE DEPRANK.
+    WHEN 'A'.
+      DEPRANKNAME = '##'.
+    WHEN 'B'.
+      DEPRANKNAME = '##'.
+    WHEN 'C'.
+      DEPRANKNAME = '##'.
+    WHEN 'D'.
+      DEPRANKNAME = '##'.
+    WHEN 'E'.
+      DEPRANKNAME = '##'.
+    WHEN 'F'.
+      DEPRANKNAME = '##'.
+    WHEN 'G'.
+      DEPRANKNAME = '##'.
+  ENDCASE.
+
+ENDFORM.
+
+FORM TRANSFORM_BANKCODE USING BANKCODE CHANGING BANKNAME.
+  CASE BANKCODE.
+    WHEN '001'.
+      BANKNAME = '##'.
+    WHEN '002'.
+      BANKNAME = '##'.
+    WHEN '003'.
+      BANKNAME = '##'.
+    WHEN '004'.
+      BANKNAME = '##'.
+    WHEN '005'.
+      BANKNAME = '###'.
+  ENDCASE.
+
+ENDFORM.
+
+FORM MODIFY_SALARY.
+
+"   ## ##.. # ## #### #### ## ## ## X
+"   ex ) 5# ## -> 2025.05.01 ### ## ##
+"   ### ### ZMON05# ##(##/12) update, # A### 5## ####
+
+  CLEAR : GS_SALARY.
+
+  DATA : LV_DATE LIKE ZEDT10_102-ZEDATE.
+
+  LOOP AT GT_SALARY INTO GS_SALARY.
+
+    CLEAR : LV_DATE.
+
+    CONCATENATE P_YEAR P_MONTH '01' INTO LV_DATE.
+
+    "## # ##
+    IF GS_SALARY-ZEDATE > LV_DATE.
+      CONTINUE.
+    ENDIF.
+
+    " ### ##
+    IF GS_SALARY-ZQFLAG = 'X'.
+      IF GS_SALARY-ZQDATE <= LV_DATE.
+        CONTINUE.
+      ELSEIF GS_SALARY-ZQDATE(4) EQ P_YEAR AND GS_SALARY-ZQDATE+4(2) EQ P_MONTH.
+        CONTINUE.
+      ENDIF.
+    ENDIF.
+
+    " ##### ## ### #### #### ### #### , ###### ### ## ##
+    IF GS_SALARY-ZRANK IS INITIAL.
+      CONTINUE.
+    ENDIF.
+
+    " ## ##
+    GS_SALARY-ZMON = GS_SALARY-ZSALARY / 12.
+
+    " A ## 5## ##
+    IF GS_SALARY-ZRANK = 'A'.
+      GS_SALARY-ZMON = GS_SALARY-ZMON + 500.
+    ENDIF.
+
+    " INTERNAL TABLE MODIFY.
+    MODIFY GT_SALARY FROM GS_SALARY.
+
+    CLEAR : GS_SALARY.
+  ENDLOOP.
+
+ENDFORM.
+
+
+FORM UPDATE_SALARY.
+
+" ZEDT10_105 TABLE# ### UPDATE.
+
+ LOOP AT GT_SALARY INTO GS_SALARY.
+
+   IF GS_SALARY-ZMON IS NOT INITIAL.
+     CASE P_MONTH.
+       WHEN '01'.
+         UPDATE ZEDT10_105 SET ZMON01 = GS_SALARY-ZMON WHERE ZPERNR = GS_SALARY-ZPERNR.
+       WHEN '02'.
+         UPDATE ZEDT10_105 SET ZMON02 = GS_SALARY-ZMON WHERE ZPERNR = GS_SALARY-ZPERNR.
+       WHEN '03'.
+         UPDATE ZEDT10_105 SET ZMON03 = GS_SALARY-ZMON WHERE ZPERNR = GS_SALARY-ZPERNR.
+       WHEN '04'.
+         UPDATE ZEDT10_105 SET ZMON04 = GS_SALARY-ZMON WHERE ZPERNR = GS_SALARY-ZPERNR.
+       WHEN '05'.
+         UPDATE ZEDT10_105 SET ZMON05 = GS_SALARY-ZMON WHERE ZPERNR = GS_SALARY-ZPERNR.
+       WHEN '06'.
+         UPDATE ZEDT10_105 SET ZMON06 = GS_SALARY-ZMON WHERE ZPERNR = GS_SALARY-ZPERNR.
+       WHEN '07'.
+         UPDATE ZEDT10_105 SET ZMON07 = GS_SALARY-ZMON WHERE ZPERNR = GS_SALARY-ZPERNR.
+       WHEN '08'.
+         UPDATE ZEDT10_105 SET ZMON08 = GS_SALARY-ZMON WHERE ZPERNR = GS_SALARY-ZPERNR.
+       WHEN '09'.
+         UPDATE ZEDT10_105 SET ZMON09 = GS_SALARY-ZMON WHERE ZPERNR = GS_SALARY-ZPERNR.
+       WHEN '10'.
+         UPDATE ZEDT10_105 SET ZMON10 = GS_SALARY-ZMON WHERE ZPERNR = GS_SALARY-ZPERNR.
+       WHEN '11'.
+         UPDATE ZEDT10_105 SET ZMON11 = GS_SALARY-ZMON WHERE ZPERNR = GS_SALARY-ZPERNR.
+       WHEN '12'.
+         UPDATE ZEDT10_105 SET ZMON12 = GS_SALARY-ZMON WHERE ZPERNR = GS_SALARY-ZPERNR.
+     ENDCASE.
+
+
+
+" ###, #### ### ##, ### , ### ##### UPDATE.
+
+     UPDATE ZEDT10_105 SET CRNAME = SY-UNAME WHERE ZPERNR = GS_SALARY-ZPERNR.
+     UPDATE ZEDT10_105 SET CRDATE = SY-DATUM WHERE ZPERNR = GS_SALARY-ZPERNR.
+     UPDATE ZEDT10_105 SET CRZEIT = SY-UZEIT WHERE ZPERNR = GS_SALARY-ZPERNR.
+
+   ENDIF.
+
+
+
+   CLEAR : GS_SALARY.
+
+ ENDLOOP.
+
+" #### ## ### ##
+ IF SY-SUBRC = 0.
+   MESSAGE I002.
+ELSE.
+  MESSAGE I003.
+ENDIF.
+
+
+
+ENDFORM.
+
+FORM MODIFY_RANK.
+
+ DATA : LV_DATE LIKE ZEDT10_102-ZEDATE.
+
+LOOP AT GT_RANK INTO GS_RANK.
+
+  CLEAR : LV_DATE.
+
+  CONCATENATE P_YEAR P_MONTH INTO LV_DATE.
+
+  " ### ##
+  IF GS_RANK-ZQFLAG = 'X'.
+    IF GS_RANK-ZQDATE(6) <= LV_DATE.
+      CONTINUE.
+    ENDIF.
+  ENDIF.
+
+  MOVE-CORRESPONDING GS_RANK TO GS_RANK_ALV.
+
+  " ###
+  PERFORM TRANSFORM_DEPCODE USING GS_RANK-ZDEPCODE
+                              CHANGING GS_RANK_ALV-ZDEPNAME.
+
+  " ###
+  PERFORM TRANSFORM_DEPRANK USING GS_RANK-ZDEPRANK
+                              CHANGING GS_RANK_ALV-ZRANKNAME.
+
+  " ##
+  PERFORM ZMON_CALCULATE USING P_YEAR P_MONTH GS_RANK-ZPERNR
+                          CHANGING GS_RANK_ALV-ZMON.
+
+  APPEND GS_RANK_ALV TO GT_RANK_ALV.
+
+ENDLOOP.
+
+
+ENDFORM.
+
+
+FORM ZMON_CALCULATE USING YEAR MONTH PERNR CHANGING PAY.
+
+  CASE MONTH.
+    WHEN '01'.
+      SELECT SINGLE ZMON01 FROM ZEDT10_105 INTO PAY
+        WHERE ZYEAR = YEAR AND ZPERNR = PERNR.
+    WHEN '02'.
+      SELECT SINGLE ZMON02 FROM ZEDT10_105 INTO PAY
+        WHERE ZYEAR = YEAR AND ZPERNR = PERNR.
+    WHEN '03'.
+      SELECT SINGLE ZMON03 FROM ZEDT10_105 INTO PAY
+         WHERE ZYEAR = YEAR AND ZPERNR = PERNR.
+    WHEN '04'.
+      SELECT SINGLE ZMON04 FROM ZEDT10_105 INTO PAY
+        WHERE ZYEAR = YEAR AND ZPERNR = PERNR.
+    WHEN '05'.
+      SELECT SINGLE ZMON05 FROM ZEDT10_105 INTO PAY
+        WHERE ZYEAR = YEAR AND ZPERNR = PERNR.
+    WHEN '06'.
+      SELECT SINGLE ZMON06 FROM ZEDT10_105 INTO PAY
+        WHERE ZYEAR = YEAR AND ZPERNR = PERNR.
+    WHEN '07'.
+      SELECT SINGLE ZMON07 FROM ZEDT10_105 INTO PAY
+        WHERE ZYEAR = YEAR AND ZPERNR = PERNR.
+    WHEN '08'.
+      SELECT SINGLE ZMON08 FROM ZEDT10_105 INTO PAY
+        WHERE ZYEAR = YEAR AND ZPERNR = PERNR.
+    WHEN '09'.
+      SELECT SINGLE ZMON09 FROM ZEDT10_105 INTO PAY
+        WHERE ZYEAR = YEAR AND ZPERNR = PERNR.
+    WHEN '10'.
+      SELECT SINGLE ZMON10 FROM ZEDT10_105 INTO PAY
+        WHERE ZYEAR = YEAR AND ZPERNR = PERNR.
+    WHEN '11'.
+      SELECT SINGLE ZMON11 FROM ZEDT10_105 INTO PAY
+        WHERE ZYEAR = YEAR AND ZPERNR = PERNR.
+    WHEN '12'.
+      SELECT SINGLE ZMON12 FROM ZEDT10_105 INTO PAY
+        WHERE ZYEAR = YEAR AND ZPERNR = PERNR.
+ ENDCASE.
+
+
+
+
+ENDFORM.
+
+
+FORM display_alv.
+
+   IF r_btn1 = 'X'.  " ####
+    PERFORM DISPLAY_EMPLOYEE.
+  ELSEIF r_btn3 = 'X'.  " ####
+    PERFORM DISPLAY_RANK.
+  ENDIF.
+
+ENDFORM.
+
+
+FORM DISPLAY_EMPLOYEE.  " ## ## ##
+
+  PERFORM FIELD_CATALOG_EMPLOYEE.
+  PERFORM ALV_LAYOUT_EMPLOYEE.
+  PERFORM CALL_ALV_EMPLOYEE.
+
+
+ENDFORM.
+
+
+FORM FIELD_CATALOG_EMPLOYEE.
+
+  CLEAR : GS_FIELDCAT, GT_FIELDCAT.
+  GS_FIELDCAT-COL_POS = 1.
+  GS_FIELDCAT-FIELDNAME = 'ZPERNR'.
+  GS_FIELDCAT-SELTEXT_M = '####'.
+  GS_FIELDCAT-KEY = 'X'.
+  APPEND GS_FIELDCAT TO GT_FIELDCAT.
+
+  CLEAR : GS_FIELDCAT.
+  GS_FIELDCAT-COL_POS = 2.
+  GS_FIELDCAT-FIELDNAME = 'ZPNAME'.
+  GS_FIELDCAT-SELTEXT_M = '####'.
+  GS_FIELDCAT-KEY = 'X'.
+  APPEND GS_FIELDCAT TO GT_FIELDCAT.
+
+  CLEAR : GS_FIELDCAT.
+  GS_FIELDCAT-COL_POS = 3.
+  GS_FIELDCAT-FIELDNAME = 'ZDEPCODE'.
+  GS_FIELDCAT-SELTEXT_M = '####'.
+  APPEND GS_FIELDCAT TO GT_FIELDCAT.
+
+  CLEAR : GS_FIELDCAT.
+  GS_FIELDCAT-COL_POS = 4.
+  GS_FIELDCAT-FIELDNAME = 'ZDEPNAME'.
+  GS_FIELDCAT-SELTEXT_M = '###'.
+  APPEND GS_FIELDCAT TO GT_FIELDCAT.
+
+  CLEAR : GS_FIELDCAT.
+  GS_FIELDCAT-COL_POS = 5.
+  GS_FIELDCAT-FIELDNAME = 'ZRANKNAME'.
+  GS_FIELDCAT-SELTEXT_M = '###'.
+  APPEND GS_FIELDCAT TO GT_FIELDCAT.
+
+  CLEAR : GS_FIELDCAT.
+  GS_FIELDCAT-COL_POS = 6.
+  GS_FIELDCAT-FIELDNAME = 'ZEDATE'.
+  GS_FIELDCAT-SELTEXT_M = '###'.
+  APPEND GS_FIELDCAT TO GT_FIELDCAT.
+
+  CLEAR : GS_FIELDCAT.
+  GS_FIELDCAT-COL_POS = 7.
+  GS_FIELDCAT-FIELDNAME = 'ZQSTATE'.
+  GS_FIELDCAT-SELTEXT_M = '####'.
+  APPEND GS_FIELDCAT TO GT_FIELDCAT.
+
+  CLEAR : GS_FIELDCAT.
+  GS_FIELDCAT-COL_POS = 8.
+  GS_FIELDCAT-FIELDNAME = 'ZGENDER'.
+  GS_FIELDCAT-SELTEXT_M = '##'.
+  APPEND GS_FIELDCAT TO GT_FIELDCAT.
+
+  CLEAR : GS_FIELDCAT.
+  GS_FIELDCAT-COL_POS = 9.
+  GS_FIELDCAT-FIELDNAME = 'ZADDRESS'.
+  GS_FIELDCAT-SELTEXT_M = '##'.
+  APPEND GS_FIELDCAT TO GT_FIELDCAT.
+
+  CLEAR : GS_FIELDCAT.
+  GS_FIELDCAT-COL_POS = 10.
+  GS_FIELDCAT-FIELDNAME = 'ZBANKCODE'.
+  GS_FIELDCAT-SELTEXT_M = '####'.
+  APPEND GS_FIELDCAT TO GT_FIELDCAT.
+
+  CLEAR : GS_FIELDCAT.
+  GS_FIELDCAT-COL_POS = 11.
+  GS_FIELDCAT-FIELDNAME = 'ZBANKNAME'.
+  GS_FIELDCAT-SELTEXT_M = '###'.
+  APPEND GS_FIELDCAT TO GT_FIELDCAT.
+
+  CLEAR : GS_FIELDCAT.
+  GS_FIELDCAT-COL_POS = 12.
+  GS_FIELDCAT-FIELDNAME = 'ZACCOUNT'.
+  GS_FIELDCAT-SELTEXT_M = '####'.
+  APPEND GS_FIELDCAT TO GT_FIELDCAT.
+
+ENDFORM.
+
+FORM ALV_LAYOUT_EMPLOYEE.
+  GS_LAYOUT_EMP-ZEBRA = 'X'.
+
+ENDFORM.
+
+FORM CALL_ALV_EMPLOYEE.
+
+  CALL FUNCTION 'REUSE_ALV_GRID_DISPLAY'
+    EXPORTING
+      IT_FIELDCAT = GT_FIELDCAT
+      IS_LAYOUT = GS_LAYOUT_EMP
+    TABLES
+      t_outtab                          = GT_EMPLOYEE_ALV
+
+            .
+  IF sy-subrc <> 0.
+* Implement suitable error handling here
+  ENDIF.
+
+ENDFORM.
+
+
+FORM DISPLAY_RANK.    "   #### ##
+
+  PERFORM FIELD_CATALOG_RANK.
+  PERFORM ALV_LAYOUT_RANK.
+  PERFORM CALL_ALV_RANK.
+
+
+ENDFORM.
+
+FORM FIELD_CATALOG_RANK.
+
+  CLEAR : GS_FIELDCAT_R, GT_FIELDCAT_R.
+  GS_FIELDCAT_R-COL_POS = 1.
+  GS_FIELDCAT_R-FIELDNAME = 'ZPERNR'.
+  GS_FIELDCAT_R-SELTEXT_M = '####'.
+  GS_FIELDCAT_R-KEY = 'X'.
+  APPEND GS_FIELDCAT_R TO GT_FIELDCAT_R.
+
+  CLEAR : GS_FIELDCAT_R.
+  GS_FIELDCAT_R-COL_POS = 2.
+  GS_FIELDCAT_R-FIELDNAME = 'ZPNAME'.
+  GS_FIELDCAT_R-SELTEXT_M = '####'.
+  GS_FIELDCAT_R-KEY = 'X'.
+  APPEND GS_FIELDCAT_R TO GT_FIELDCAT_R.
+
+  CLEAR : GS_FIELDCAT_R.
+  GS_FIELDCAT_R-COL_POS = 3.
+  GS_FIELDCAT_R-FIELDNAME = 'ZDEPCODE'.
+  GS_FIELDCAT_R-SELTEXT_M = '####'.
+  APPEND GS_FIELDCAT_R TO GT_FIELDCAT_R.
+
+  CLEAR : GS_FIELDCAT_R.
+  GS_FIELDCAT_R-COL_POS = 4.
+  GS_FIELDCAT_R-FIELDNAME = 'ZDEPNAME'.
+  GS_FIELDCAT_R-SELTEXT_M = '###'.
+  APPEND GS_FIELDCAT_R TO GT_FIELDCAT_R.
+
+  CLEAR : GS_FIELDCAT_R.
+  GS_FIELDCAT_R-COL_POS = 5.
+  GS_FIELDCAT_R-FIELDNAME = 'ZRANKNAME'.
+  GS_FIELDCAT_R-SELTEXT_M = '###'.
+  APPEND GS_FIELDCAT_R TO GT_FIELDCAT_R.
+
+  CLEAR : GS_FIELDCAT_R.
+  GS_FIELDCAT_R-COL_POS = 6.
+  GS_FIELDCAT_R-FIELDNAME = 'ZEDATE'.
+  GS_FIELDCAT_R-SELTEXT_M = '###'.
+  APPEND GS_FIELDCAT_R TO GT_FIELDCAT_R.
+
+  CLEAR : GS_FIELDCAT_R.
+  GS_FIELDCAT_R-COL_POS = 7.
+  GS_FIELDCAT_R-FIELDNAME = 'ZSALARY'.
+  GS_FIELDCAT_R-SELTEXT_M = '####'.
+  GS_FIELDCAT_R-DO_SUM = 'X'.
+  GS_FIELDCAT_R-CURRENCY = 'KRW'.
+  APPEND GS_FIELDCAT_R TO GT_FIELDCAT_R.
+
+  CLEAR : GS_FIELDCAT_R.
+  GS_FIELDCAT_R-COL_POS = 8.
+  GS_FIELDCAT_R-FIELDNAME = 'ZRANK'.
+  GS_FIELDCAT_R-SELTEXT_M = '####'.
+  APPEND GS_FIELDCAT_R TO GT_FIELDCAT_R.
+
+  CLEAR : GS_FIELDCAT_R.
+  GS_FIELDCAT_R-COL_POS = 9.
+  GS_FIELDCAT_R-FIELDNAME = 'ZMON'.
+  CONCATENATE P_MONTH '####' INTO GS_FIELDCAT_R-SELTEXT_M.
+  GS_FIELDCAT_R-DO_SUM = 'X'.
+  GS_FIELDCAT_R-CURRENCY = 'KRW'.
+  APPEND GS_FIELDCAT_R TO GT_FIELDCAT_R.
+
+
+ENDFORM.
+
+FORM ALV_LAYOUT_RANK.
+  GS_LAYOUT_R-ZEBRA = 'X'.
+
+ENDFORM.
+
+FORM CALL_ALV_RANK.
+
+   CALL FUNCTION 'REUSE_ALV_GRID_DISPLAY'
+    EXPORTING
+      IT_FIELDCAT = GT_FIELDCAT_R
+      IS_LAYOUT = GS_LAYOUT_R
+    TABLES
+      t_outtab                          = GT_RANK_ALV
+
+            .
+  IF sy-subrc <> 0.
+* Implement suitable error handling here
+  ENDIF.
+
+
+ENDFORM.
+
+
+*Selection texts
+*----------------------------------------------------------
+* P_CHK1         ####
+* P_MONTH         #
+* P_YEAR         ##
+* R_BTN1         ####
+* R_BTN2         ####
+* R_BTN3         ####
+* S_DATE         ##
+* S_DECODE         ####
+* S_ZPERNR         ####
+
+
+*Messages
+*----------------------------------------------------------
+*
+* Message class: ZMED10
+*000   ##### ######
+*002   ### #######.
+*003   #### ##
+
+----------------------------------------------------------------------------------
+Extracted by Mass Download version 1.4.6 - E.G.Mellodew. 1998-2025. Sap Release 750

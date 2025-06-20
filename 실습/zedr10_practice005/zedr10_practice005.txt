@@ -1,0 +1,89 @@
+*&---------------------------------------------------------------------*
+*& Report ZEDR10_PRACTICE005
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZEDR10_PRACTICE005.
+
+
+"     RANGE TABLE ## X
+
+*SELECTION-SCREEN BEGIN OF BLOCK B1 WITH FRAME.
+*
+*PARAMETERS : P_YEAR TYPE N LENGTH 4 DEFAULT SY-DATUM+0(4).
+*PARAMETERS : P_MONTH TYPE N LENGTH 2 DEFAULT SY-DATUM+4(2).
+*
+*SELECTION-SCREEN END OF BLOCK B1.
+*
+*
+*DATA : D_DAY TYPE SY-DATUM,
+*      O_DAY TYPE SY-DATUM,
+*      RESULT_MSG TYPE C LENGTH 50.
+*
+*PERFORM MAKE_DAY.
+*
+*
+*CALL FUNCTION 'RP_LAST_DAY_OF_MONTHS'
+*  EXPORTING
+*    day_in                  = D_DAY
+* IMPORTING
+*   LAST_DAY_OF_MONTH       = O_DAY
+* EXCEPTIONS
+*   DAY_IN_NO_DATE          = 1
+*   OTHERS                  = 2.
+*
+*
+*
+*CONCATENATE P_YEAR ' #'  P_MONTH  '## ### ## ' O_DAY+0(4) '.' O_DAY+4(2) '.' O_DAY+6(2) ' ###' INTO RESULT_MSG.
+*WRITE : / RESULT_MSG.
+*
+*
+*
+*
+*
+*FORM MAKE_DAY.
+*
+*    CONCATENATE P_YEAR P_MONTH INTO D_DAY.
+*
+*ENDFORM.
+
+
+
+"     RANGE TABLE ##
+
+RANGES : GR_DAY FOR SY-DATUM.
+
+GR_DAY-SIGN = 'I'.
+GR_DAY-OPTION = 'BT'.
+GR_DAY-LOW = '01'.
+
+
+PARAMETERS : P_YEAR LIKE  BKPF-GJAHR DEFAULT SY-DATUM+0(4) .
+PARAMETERS : P_MONTH LIKE BKPF-MONAT DEFAULT SY-DATUM+4(2).
+
+CONCATENATE P_YEAR P_MONTH GR_DAY-LOW INTO GR_DAY-LOW.
+APPEND GR_DAY.
+
+CALL FUNCTION 'RP_LAST_DAY_OF_MONTHS'
+  EXPORTING
+    day_in                  = GR_DAY-LOW
+ IMPORTING
+   LAST_DAY_OF_MONTH       =  GR_DAY-HIGH
+ EXCEPTIONS
+   DAY_IN_NO_DATE          = 1
+   OTHERS                  = 2
+   .
+APPEND GR_DAY.
+
+IF GR_DAY-HIGH IS NOT INITIAL.
+  WRITE : / P_YEAR, '#', P_MONTH, '## #####', GR_DAY-HIGH, '###'.
+ENDIF.
+
+
+*Selection texts
+*----------------------------------------------------------
+* P_MONTH         #
+* P_YEAR         ##
+
+----------------------------------------------------------------------------------
+Extracted by Mass Download version 1.4.6 - E.G.Mellodew. 1998-2025. Sap Release 750
