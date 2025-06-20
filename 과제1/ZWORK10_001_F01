@@ -1,0 +1,698 @@
+*&---------------------------------------------------------------------*
+*&  Include           ZWORK10_001_F01
+*&---------------------------------------------------------------------*
+*&---------------------------------------------------------------------*
+*&      Form  SET_INIT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM set_init .
+
+  sscrfields-functxt_01 = icon_insert_row && '## ### ####'.
+
+*  BTN_TEXT = '## ### ####'.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  MODIFY_SCREEN
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM modify_screen .
+
+  LOOP AT SCREEN.
+    IF screen-group1 = 'M1'.
+      screen-input = '0'.
+    ENDIF.
+    MODIFY SCREEN.
+  ENDLOOP.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  GET_FILE
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*      <--P_P_FILE  text
+*----------------------------------------------------------------------*
+FORM get_file  CHANGING p_file.
+
+  CALL FUNCTION 'WS_FILENAME_GET'
+    EXPORTING
+      mask             = ' '
+      mode             = ' '
+      title            = ' '
+    IMPORTING
+      filename         = p_file
+    EXCEPTIONS
+      inv_winsys       = 1
+      no_batch         = 2
+      selection_cancel = 3
+      selection_error  = 4
+      OTHERS           = 5.
+  IF sy-subrc <> 0.
+* Implement suitable error handling here
+  ENDIF.
+
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  GET_DATA
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM get_data .
+
+  DATA: lt_alsmex TYPE STANDARD TABLE OF alsmex_tabline,
+        gs_alsmex TYPE alsmex_tabline.
+
+  DATA: lt_dfies     TYPE STANDARD TABLE OF dfies,
+        ls_dfies     TYPE dfies,
+        current_row  TYPE i VALUE -1,
+        lv_fieldname TYPE fieldname.
+
+  FIELD-SYMBOLS: <fs_field> TYPE any.
+
+
+*  PERFORM get_file CHANGING P_FILE.
+
+  IF p_file IS INITIAL.
+    MESSAGE '### #### #####.' TYPE 'E'.
+    RETURN.
+  ENDIF.
+
+  " ## ### ## #### ####
+  CALL FUNCTION 'ALSM_EXCEL_TO_INTERNAL_TABLE'
+    EXPORTING
+      filename    = p_file
+      i_begin_col = 1
+      i_begin_row = 2
+      i_end_col   = 100
+      i_end_row   = 10000
+    TABLES
+      intern      = lt_alsmex
+    EXCEPTIONS
+      OTHERS      = 1.
+
+  IF lt_alsmex IS INITIAL.
+    MESSAGE '#### #### #### #####.' TYPE 'E'.
+    RETURN.
+  ENDIF.
+
+  " ### ##### #### (### ###)
+  CALL FUNCTION 'DDIF_FIELDINFO_GET'
+    EXPORTING
+      tabname   = 'ZTCURR10'
+      langu     = sy-langu
+    TABLES
+      dfies_tab = lt_dfies
+    EXCEPTIONS
+      OTHERS    = 1.
+
+  IF lt_dfies IS INITIAL.
+    MESSAGE '### #### ## ##' TYPE 'E'.
+    RETURN.
+  ENDIF.
+
+  SORT lt_alsmex BY row col.
+
+  LOOP AT lt_alsmex INTO gs_alsmex.
+
+    " # ## #### ## ### ## # ###
+    IF current_row <> gs_alsmex-row.
+      IF current_row >= 0.
+        APPEND gs_ztcurr10 TO gt_ztcurr10.
+        CLEAR gs_ztcurr10.
+      ENDIF.
+      current_row = gs_alsmex-row.
+    ENDIF.
+
+    " ## ### #### ### ####
+    " ## ## ### ## ### ## (MANDT ##, 1~7 ##)
+    CASE gs_alsmex-col.
+      WHEN 1. lv_fieldname = 'KURST'.
+      WHEN 2. lv_fieldname = 'FCURR'.
+      WHEN 3. lv_fieldname = 'TCURR'.
+      WHEN 4. lv_fieldname = 'GDATU'.
+      WHEN 5. lv_fieldname = 'UKURS'.
+      WHEN 6. lv_fieldname = 'FFACT'.
+      WHEN 7. lv_fieldname = 'TFACT'.
+      WHEN OTHERS. CONTINUE.
+    ENDCASE.
+
+
+    " ### # ##
+    ASSIGN COMPONENT lv_fieldname OF STRUCTURE gs_ztcurr10 TO <fs_field>.
+    IF sy-subrc = 0.
+      <fs_field> = gs_alsmex-value.
+      gs_ztcurr10-mandt = sy-mandt.
+    ENDIF.
+
+  ENDLOOP.
+
+  " ### ROW append
+  IF current_row >= 0.
+    APPEND gs_ztcurr10 TO gt_ztcurr10.
+  ENDIF.
+
+  MESSAGE |# { lines( gt_ztcurr10 ) }## #### #######.| TYPE 'I'.
+
+
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  MODIFY_DATA
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM modify_data .
+
+  DATA : lv_date TYPE c LENGTH 8.
+
+  CLEAR : lv_date.
+  CONCATENATE p_date+0(4) p_date+4(2) INTO lv_date.
+  CONCATENATE lv_date p_date+6(2) INTO lv_date.
+
+
+  LOOP AT gt_ztcurr10 INTO gs_ztcurr10.
+    MOVE-CORRESPONDING gs_ztcurr10 TO gs_alv_display.
+    gs_alv_display-gdatu = lv_date.
+    gs_alv_display-uname = sy-uname.
+    gs_alv_display-idate = sy-datum.
+    APPEND gs_alv_display TO gt_alv_display.
+
+  ENDLOOP.
+
+
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  CREATE_OBJECT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM create_object .
+
+  CREATE OBJECT gc_docking
+    EXPORTING
+*     parent    =
+      repid     = sy-repid
+      dynnr     = sy-dynnr
+*     side      = DOCK_AT_LEFT
+      extension = 2000
+*     style     =
+*     lifetime  = lifetime_default
+*     caption   =
+*     metric    = 0
+*     ratio     =
+*     no_autodef_progid_dynnr     =
+*     name      =
+*    EXCEPTIONS
+*     cntl_error                  = 1
+*     cntl_system_error           = 2
+*     create_error                = 3
+*     lifetime_error              = 4
+*     lifetime_dynpro_dynpro_link = 5
+*     others    = 6
+    .
+  IF sy-subrc <> 0.
+*   MESSAGE ID SY-MSGID TYPE SY-MSGTY NUMBER SY-MSGNO
+*              WITH SY-MSGV1 SY-MSGV2 SY-MSGV3 SY-MSGV4.
+  ENDIF.
+
+
+  CREATE OBJECT gc_grid
+    EXPORTING
+*     i_shellstyle      = 0
+*     i_lifetime        =
+      i_parent = gc_docking
+*     i_appl_events     = space
+*     i_parentdbg       =
+*     i_applogparent    =
+*     i_graphicsparent  =
+*     i_name   =
+*     i_fcat_complete   = SPACE
+*  EXCEPTIONS
+*     error_cntl_create = 1
+*     error_cntl_init   = 2
+*     error_cntl_link   = 3
+*     error_dp_create   = 4
+*     others   = 5
+    .
+  IF sy-subrc <> 0.
+* MESSAGE ID SY-MSGID TYPE SY-MSGTY NUMBER SY-MSGNO
+*            WITH SY-MSGV1 SY-MSGV2 SY-MSGV3 SY-MSGV4.
+  ENDIF.
+
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  ALV_FIELDCAT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM alv_fieldcat .
+
+  CLEAR : gs_fieldcat, gt_fieldcat.
+  gs_fieldcat-col_pos = 1.
+  gs_fieldcat-fieldname = 'KURST'.
+  gs_fieldcat-scrtext_m = '####'.
+  gs_fieldcat-key = 'X'.
+  APPEND gs_fieldcat TO gt_fieldcat.
+
+  CLEAR : gs_fieldcat.
+  gs_fieldcat-col_pos = 2.
+  gs_fieldcat-fieldname = 'FCURR'.
+  gs_fieldcat-scrtext_m = '####'.
+  gs_fieldcat-key = 'X'.
+  APPEND gs_fieldcat TO gt_fieldcat.
+
+  CLEAR : gs_fieldcat.
+  gs_fieldcat-col_pos = 3.
+  gs_fieldcat-fieldname = 'TCURR'.
+  gs_fieldcat-scrtext_m = '####'.
+  gs_fieldcat-key = 'X'.
+  APPEND gs_fieldcat TO gt_fieldcat.
+
+  CLEAR : gs_fieldcat.
+  gs_fieldcat-col_pos = 4.
+  gs_fieldcat-fieldname = 'GDATU'.
+  gs_fieldcat-scrtext_m = '####'.
+  gs_fieldcat-key = 'X'.
+  APPEND gs_fieldcat TO gt_fieldcat.
+
+  CLEAR : gs_fieldcat.
+  gs_fieldcat-col_pos = 5.
+  gs_fieldcat-fieldname = 'UKURS'.
+  gs_fieldcat-scrtext_m = '##'.
+  gs_fieldcat-edit = 'X'.
+  GS_FIELDCAT-DECIMALS = '5'.
+  APPEND gs_fieldcat TO gt_fieldcat.
+
+  CLEAR : gs_fieldcat.
+  gs_fieldcat-col_pos = 6.
+  gs_fieldcat-fieldname = 'FFACT'.
+  gs_fieldcat-scrtext_m = '########'.
+  APPEND gs_fieldcat TO gt_fieldcat.
+
+  CLEAR : gs_fieldcat.
+  gs_fieldcat-col_pos = 7.
+  gs_fieldcat-fieldname = 'TFACT'.
+  gs_fieldcat-scrtext_m = '########'.
+  APPEND gs_fieldcat TO gt_fieldcat.
+
+  CLEAR : gs_fieldcat.
+  gs_fieldcat-col_pos = 8.
+  gs_fieldcat-fieldname = 'UNAME'.
+  gs_fieldcat-scrtext_m = '###'.
+  APPEND gs_fieldcat TO gt_fieldcat.
+
+  CLEAR : gs_fieldcat.
+  gs_fieldcat-col_pos = 9.
+  gs_fieldcat-fieldname = 'IDATE'.
+  gs_fieldcat-scrtext_m = '###'.
+  APPEND gs_fieldcat TO gt_fieldcat.
+
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  ALV_LAYOUT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM alv_layout .
+
+  CLEAR : gs_layout.
+  gs_layout-zebra = 'X'.
+
+  CLEAR : gs_variant.
+  gs_variant-report = sy-repid.
+  gs_variant-username = sy-uname.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  ALV_SORT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM alv_sort .
+
+  CLEAR : gs_sort, gt_sort.
+*  GS_SORT-SPOS = 1.
+*  GS_SORT-FIELDNAME = 'KURST'.
+*  GS_SORT-UP = 'X'.
+*  APPEND GS_SORT TO GT_SORT.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  ALV_DISPLAY
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM alv_display .
+
+  CALL METHOD gc_grid->set_table_for_first_display
+    EXPORTING
+*     i_buffer_active =
+*     i_bypassing_buffer            =
+*     i_consistency_check           =
+*     i_structure_name              =
+      is_variant      = gs_variant
+      i_save          = 'A'
+*     i_default       = 'X'
+      is_layout       = gs_layout
+*     is_print        =
+*     it_special_groups             =
+*     it_toolbar_excluding          =
+*     it_hyperlink    =
+*     it_alv_graphics =
+*     it_except_qinfo =
+*     ir_salv_adapter =
+    CHANGING
+      it_outtab       = gt_alv_display
+      it_fieldcatalog = gt_fieldcat
+      it_sort         = gt_sort
+*     it_filter       =
+*    EXCEPTIONS
+*     invalid_parameter_combination = 1
+*     program_error   = 2
+*     too_many_lines  = 3
+*     others          = 4
+    .
+  IF sy-subrc <> 0.
+*   Implement suitable error handling here
+  ENDIF.
+
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  REGISTER_EXCHANGE_RATE
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM register_exchange_rate .
+
+  DATA: lv_ukurs        TYPE string,
+        lv_ukurs_save   TYPE ztcurr10-ukurs,
+        lv_gdatu_input  TYPE char8,
+        lv_gdatu_conv   TYPE ztcurr10-gdatu.
+
+  CLEAR: gs_ztcurr10, gt_ztcurr10.
+
+  LOOP AT gt_alv_display INTO gs_alv_display.
+
+    MOVE-CORRESPONDING gs_alv_display TO gs_ztcurr10.
+
+    " ## ## ## (## -> ## ##)
+    lv_gdatu_input = gs_alv_display-gdatu.
+    CALL FUNCTION 'CONVERSION_EXIT_INVDT_INPUT'
+      EXPORTING
+        input  = lv_gdatu_input
+      IMPORTING
+        output = lv_gdatu_conv.
+    gs_ztcurr10-gdatu = lv_gdatu_conv.
+
+*    " ## ###: ## ## # ## ##
+*    lv_ukurs = gs_alv_display-ukurs.
+*    REPLACE ALL OCCURRENCES OF ',' IN lv_ukurs WITH ''.
+*    CONDENSE lv_ukurs NO-GAPS.
+*    lv_ukurs_save = lv_ukurs.
+*    gs_ztcurr10-ukurs = lv_ukurs_save.
+
+    " ### # ### ##
+    gs_ztcurr10-crname = sy-uname.
+*    gs_ztcurr10-crdate = p_date.
+    gs_ztcurr10-crdate = SY-DATUM.
+
+    APPEND gs_ztcurr10 TO gt_ztcurr10.
+    CLEAR: gs_ztcurr10, gs_alv_display.
+
+  ENDLOOP.
+
+  LOOP AT gt_ztcurr10 INTO DATA(ls_entry).
+
+    MODIFY ztcurr10 FROM ls_entry.
+
+    IF sy-subrc = 0.
+      WRITE: / |#### ## ## ##: { ls_entry-kurst } { ls_entry-fcurr } { ls_entry-tcurr } { ls_entry-gdatu }|.
+    ELSE.
+      WRITE: / |##: { ls_entry-kurst } { ls_entry-fcurr } { ls_entry-tcurr } { ls_entry-gdatu }|.
+    ENDIF.
+
+  ENDLOOP.
+
+  COMMIT WORK.
+  MESSAGE '#######' TYPE 'I'.
+
+ENDFORM.
+
+*&---------------------------------------------------------------------*
+*&      Form  DOWNLOAD_EXCEL_TEMPLATE
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM download_excel_template .
+
+  DATA lv_savepath TYPE string.
+
+  "4-1. #### ##
+  PERFORM set_save_path CHANGING lv_savepath.
+
+  "4-2. Web Repository## ## ## # ##
+  PERFORM save_template USING lv_savepath.
+
+ENDFORM.
+
+
+
+FORM set_save_path CHANGING pv_savepath.
+  DATA : lv_path          TYPE string,
+         lv_save_filename TYPE string.
+  DATA(lv_filename) = |##_###_| & |{ sy-uname }| & |.xlsx|.
+
+  cl_gui_frontend_services=>file_save_dialog(
+    EXPORTING
+      default_file_name         = lv_filename
+      file_filter               = 'Excel files (*.XLS;*.XLSX)|*.XLSX'
+      initial_directory         = 'C:\'
+    CHANGING
+      filename                  = lv_save_filename
+      path                      = lv_path
+      fullpath                  = pv_savepath
+    EXCEPTIONS
+      cntl_error                = 1                " Control error
+      error_no_gui              = 2                " No GUI available
+      not_supported_by_gui      = 3                " GUI does not support this
+      invalid_default_file_name = 4                " Invalid default file name
+      OTHERS                    = 5
+  ).
+  IF sy-subrc <> 0.
+    MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+  ENDIF.
+ENDFORM.
+
+
+
+
+FORM save_template USING pv_savepath.
+
+  DATA: ls_wwwkey TYPE wwwdatatab,        " ### ##
+        lv_file   TYPE rlgrap-filename.
+
+  " #### ## ##
+  CHECK pv_savepath IS NOT INITIAL.
+  lv_file = pv_savepath.
+
+  " SMW0# ### MIME ### KEY ##
+  CLEAR ls_wwwkey.
+  ls_wwwkey-relid = 'MI'.
+  ls_wwwkey-objid = 'ZTPL10_001'.   " SMW0## ### ## (#### ###)
+
+  " # #### ####
+  CALL FUNCTION 'DOWNLOAD_WEB_OBJECT'
+    EXPORTING
+      key         = ls_wwwkey
+      destination = lv_file
+    EXCEPTIONS
+      OTHERS      = 1.
+
+  " ## # ##
+  IF sy-subrc = 0.
+    cl_gui_frontend_services=>execute(
+      EXPORTING
+        document  = pv_savepath
+        operation = 'OPEN'
+      EXCEPTIONS
+        OTHERS    = 1
+    ).
+  ELSE.
+    MESSAGE '## ### #### ##' TYPE 'E'.
+  ENDIF.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  ALV_HANDLER_DATA_CHANGED
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*      -->P_ER_DATA_CHANGED  text
+*      -->P_E_ONF4  text
+*      -->P_E_ONF4_BEFORE  text
+*      -->P_E_ONF4_AFTER  text
+*      -->P_E_UCOMM  text
+*----------------------------------------------------------------------*
+FORM alv_handler_data_changed  USING    p_data_changed TYPE REF TO cl_alv_changed_data_protocol
+                                        p_onf4
+                                        p_onf4_before
+                                        p_onf4_after
+                                        p_ucomm.
+
+  DATA : ls_modi    TYPE lvc_s_modi,
+         lv_len(02).
+
+  CLEAR : ls_modi, lv_len.
+
+  LOOP AT p_data_changed->mt_good_cells INTO ls_modi.
+
+    IF ls_modi-fieldname = 'UKURS'.
+
+      READ TABLE gt_alv_display INTO gs_alv_display INDEX ls_modi-row_id.
+
+      IF ls_modi-value IS INITIAL.
+        gs_alv_display-icon = icon_led_red.
+      ELSE.
+        gs_alv_display-icon = icon_led_green.
+      ENDIF.
+
+      MODIFY gt_alv_display FROM gs_alv_display INDEX ls_modi-row_id.
+      CLEAR : gs_alv_display.
+
+    ENDIF.
+
+  ENDLOOP.
+
+  PERFORM refresh.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  ALV_DATA_CHANGED_FINISHED
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*      -->P_E_MODIFIED  text
+*      -->P_ET_GOOD_CELLS  text
+*----------------------------------------------------------------------*
+FORM alv_data_changed_finished  USING    p_modified
+                                         p_good_cells TYPE LVC_T_MODI.
+
+    DATA : ls_modi    TYPE lvc_s_modi.
+  CLEAR : ls_modi.
+
+  LOOP AT P_GOOD_CELLS INTO LS_MODI.
+    IF LS_MODI-FIELDNAME = 'UKURS'.
+      READ TABLE GT_ALV_DISPLAY INTO GS_ALV_DISPLAY INDEX LS_MODI-ROW_ID.
+
+      IF GS_ALV_DISPLAY-ICON EQ ICON_LED_RED.
+        DELETE TABLE GT_ALV_DISPLAY FROM GS_ALV_DISPLAY.
+      ENDIF.
+
+      CLEAR GS_ALV_DISPLAY.
+
+   ENDIF.
+
+  ENDLOOP.
+
+  PERFORM REFRESH.
+
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  REFRESH
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM refresh .
+
+  DATA : ls_stable TYPE lvc_s_stbl.
+
+  LS_STABLE-ROW = 'X'.
+  LS_STABLE-COL = 'X'.
+
+CALL METHOD gc_grid->refresh_table_display
+  EXPORTING
+    is_stable      = LS_STABLE
+*    i_soft_refresh =
+*  EXCEPTIONS
+*    finished       = 1
+*    others         = 2
+        .
+IF sy-subrc <> 0.
+* Implement suitable error handling here
+ENDIF.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  CLASS_EVENT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM class_event .
+
+  CREATE OBJECT go_event.
+
+  SET HANDLER go_event->handler_data_changed FOR gc_grid.
+  SET HANDLER go_event->handler_data_changed_finished FOR gc_grid.
+
+  " SCREEN# ITAB ###
+  CALL METHOD gc_grid->register_edit_event
+    EXPORTING
+      i_event_id = CL_GUI_ALV_GRID=>MC_EVT_MODIFIED
+*    EXCEPTIONS
+*      error      = 1
+*      others     = 2
+          .
+  IF sy-subrc <> 0.
+*   Implement suitable error handling here
+  ENDIF.
+
+
+ENDFORM.

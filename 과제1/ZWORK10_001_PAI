@@ -1,0 +1,84 @@
+*&---------------------------------------------------------------------*
+*&  Include           ZWORK10_001_PAI
+*&---------------------------------------------------------------------*
+*&---------------------------------------------------------------------*
+*&      Module  USER_COMMAND_0100  INPUT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+MODULE user_command_0100 INPUT.
+
+  CASE OK_CODE.
+    WHEN 'SAVE'.
+
+      DATA : LV_ANSWER1 TYPE C,
+            LV_ANSWER2 TYPE C.
+      CLEAR : LV_ANSWER1, LV_ANSWER2.
+
+   DO.
+
+      CALL FUNCTION 'POPUP_TO_CONFIRM'
+        EXPORTING
+         TITLEBAR                    = '####'
+          text_question               = '##### ## ########?'
+         TEXT_BUTTON_1               = 'YES'
+         TEXT_BUTTON_2               = 'NO'
+*         DEFAULT_BUTTON              = '1'
+         DISPLAY_CANCEL_BUTTON       = ''
+       IMPORTING
+         ANSWER                      = LV_ANSWER1
+                .
+      IF sy-subrc <> 0.
+        MESSAGE '## ## # ### ######.' TYPE 'E'.
+        RETURN.
+      ENDIF.
+
+      IF LV_ANSWER1 = '1'. " YES ##
+        PERFORM REGISTER_EXCHANGE_RATE.
+        MESSAGE '## ### ##### #######.' TYPE 'S'.
+        EXIT.
+
+      ELSEIF LV_ANSWER1 = '2'. " NO ##
+*        MESSAGE '### #######.' TYPE 'I'.
+        CALL FUNCTION 'POPUP_TO_CONFIRM'
+          EXPORTING
+           TITLEBAR                    = '## ##'
+            text_question               = '### #######. ## SKIP ######?'
+           TEXT_BUTTON_1               = '## SKIP'
+           TEXT_BUTTON_2               = '##'
+           DISPLAY_CANCEL_BUTTON       = ''
+         IMPORTING
+           ANSWER                      = LV_ANSWER2.
+
+          IF LV_ANSWER2 = '1'.
+            LEAVE TO SCREEN 100.
+            EXIT.
+          ELSEIF LV_ANSWER2 = '2'.
+            CONTINUE.
+
+          ENDIF.
+
+
+        ENDIF.
+
+      ENDDO.
+
+
+  ENDCASE.
+
+ENDMODULE.
+*&---------------------------------------------------------------------*
+*&      Module  EXIT_COMMAND  INPUT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+MODULE exit_command INPUT.
+
+  CASE OK_CODE.
+    WHEN 'BACK' OR 'CANC'.
+      LEAVE TO SCREEN 0.
+    WHEN 'EXIT'.
+      LEAVE PROGRAM.
+  ENDCASE.
+
+ENDMODULE.
