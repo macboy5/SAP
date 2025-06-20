@@ -1,0 +1,495 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="application/xhtml+xml; charset=EUC-KR" />
+<title>ZEDR10_PRACTICE003</title>
+<style type="text/css">
+.code{ font-family:"Courier New", Courier, monospace; color:#000; font-size:14px; background-color:#F2F4F7 }
+  .codeComment {font-family:"Courier New", Courier, monospace; color:#0000F0; font-size:14px; background-color:#F2F4F7 }
+  .normalBold{ font-family:Arial, Helvetica, sans-serif; color:#000; font-size:12px; font-weight:800 }
+  .normalBoldLarge{ font-family:Arial, Helvetica, sans-serif; color:#000; font-size:16px; font-weight:800 }
+</style>
+<style type="text/css">
+  .normal{ font-family:Arial, Helvetica, sans-serif; color:#000; font-size:12px }
+  .footer{ font-family:Arial, Helvetica, sans-serif; color:#000; font-size:12px; text-align: center }
+  h2{ font-family:Arial, Helvetica, sans-serif; color:#000; font-size:16px; font-weight:800 }
+  h3{ font-family:Arial, Helvetica, sans-serif; color:#000; font-size:14px; font-weight:800 }
+  .outerTable{
+   background-color:#E0E7ED;
+   width:100%;
+   border-top-width: thin;
+   border-right-width: thin;
+   border-right-width: thin;
+   border-left-width: thin;
+   border-top-style: solid;
+   border-right-style: solid;
+   border-bottom-style: solid;
+   border-left-style: solid;
+  }
+  .innerTable{
+   background-color:#F2F4F7;
+   width:100%;
+   border-top-width: thin;
+   border-right-width: thin;
+   border-bottom-width: thin;
+   border-left-width: thin;
+   border-top-style: solid;
+   border-right-style: solid;
+   border-bottom-style: solid;
+   border-left-style: solid;
+  }
+</style>
+</head>
+<body>
+<table class="outerTable">
+  <tr class="normalBoldLarge">
+     <td><h2>Code listing for: ZEDR10_PRACTICE003</h2>
+<h3> Description: #######</h3></td>
+   </tr>
+  <tr>
+     <td>
+     <table class="innerTable">
+       <tr>
+          <td>
+   <div class="codeComment">
+*&---------------------------------------------------------------------*<br />
+*&&nbsp;Report&nbsp;ZEDR10_PRACTICE003<br />
+*&---------------------------------------------------------------------*<br />
+*&<br />
+*&---------------------------------------------------------------------*<br />
+   </div>
+   <div class="code">
+REPORT ZEDR10_PRACTICE003.<br />
+<br />
+"   ZEDT10_100<br />
+TABLES : ZEDT10_100.<br />
+<br />
+DATA : BEGIN OF GS_ORDER.<br />
+&nbsp;&nbsp;include&nbsp;structure&nbsp;<a&nbsp;href&nbsp;="zedt10_100/dictionary-zedt10_100.html">ZEDT10_100</a>.<br />
+DATA : END OF GS_ORDER.<br />
+DATA : GT_ORDER LIKE TABLE OF GS_ORDER.<br />
+<br />
+"   ZEDT10_101<br />
+TABLES : ZEDT10_101.<br />
+<br />
+DATA : BEGIN OF GS_DLVRY.<br />
+&nbsp;&nbsp;include&nbsp;structure&nbsp;<a&nbsp;href&nbsp;="zedt10_101/dictionary-zedt10_101.html">ZEDT10_101</a>.<br />
+DATA : END OF GS_DLVRY.<br />
+DATA : GT_DLVRY LIKE TABLE OF GS_DLVRY.<br />
+<br />
+"   #### ###<br />
+DATA : BEGIN OF GS_WRITE1.<br />
+&nbsp;&nbsp;include&nbsp;structure&nbsp;<a&nbsp;href&nbsp;="zedt10_100/dictionary-zedt10_100.html">ZEDT10_100</a>.<br />
+&nbsp;&nbsp;DATA&nbsp;:&nbsp;P_TYPE&nbsp;TYPE&nbsp;C&nbsp;LENGTH&nbsp;6,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PRICE1&nbsp;TYPE&nbsp;I,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PRICE2&nbsp;TYPE&nbsp;I,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PRICE3&nbsp;TYPE&nbsp;I,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SALE_TYPE&nbsp;TYPE&nbsp;C&nbsp;LENGTH&nbsp;6,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SELL_TYPE&nbsp;TYPE&nbsp;C&nbsp;LENGTH&nbsp;6,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RETURNS_TYPE&nbsp;TYPE&nbsp;C&nbsp;LENGTH&nbsp;8.<br />
+DATA : END OF GS_WRITE1.<br />
+DATA : GT_WRITE1 LIKE TABLE OF GS_WRITE1.<br />
+<br />
+"   #### ###<br />
+DATA : BEGIN OF GS_WRITE2.<br />
+&nbsp;&nbsp;include&nbsp;structure&nbsp;<a&nbsp;href&nbsp;="zedt10_101/dictionary-zedt10_101.html">ZEDT10_101</a>.<br />
+&nbsp;&nbsp;DATA&nbsp;:&nbsp;P_TYPE&nbsp;TYPE&nbsp;C&nbsp;LENGTH&nbsp;6,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PRICE1&nbsp;TYPE&nbsp;I,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DLVRY_POS&nbsp;TYPE&nbsp;C&nbsp;LENGTH&nbsp;8,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;REGION&nbsp;TYPE&nbsp;C&nbsp;LENGTH&nbsp;6.<br />
+DATA : END OF GS_WRITE2.<br />
+DATA : GT_WRITE2 LIKE TABLE OF GS_WRITE2.<br />
+<br />
+CONSTANTS : C_RATE TYPE I VALUE 100.<br />
+<br />
+<br />
+SELECTION-SCREEN BEGIN OF BLOCK B1 WITH FRAME.<br />
+<br />
+"   ####<br />
+SELECT-OPTIONS : S_ZORDNO FOR ZEDT10_100-ZORDNO.<br />
+"   ##ID<br />
+SELECT-OPTIONS: S_ZID FOR ZEDT10_100-ZIDCODE NO INTERVALS NO-EXTENSION.<br />
+"   ####<br />
+SELECT-OPTIONS : S_ZMATNR FOR ZEDT10_100-ZMATNR.<br />
+"   ####<br />
+SELECT-OPTIONS : S_ZJDATE FOR ZEDT10_100-ZJDATE MODIF ID M1.<br />
+"   ####<br />
+SELECT-OPTIONS : S_ZDDATE FOR ZEDT10_101-ZDDATE MODIF ID M2.<br />
+<br />
+SELECTION-SCREEN END OF BLOCK B1.<br />
+<br />
+<br />
+<br />
+SELECTION-SCREEN BEGIN OF BLOCK B2 WITH FRAME.<br />
+<br />
+"   ####<br />
+PARAMETERS : P_ORDER RADIOBUTTON GROUP R1 DEFAULT 'X' USER-COMMAND UC1.<br />
+"   ####<br />
+PARAMETERS : P_DLVRY RADIOBUTTON GROUP R1.<br />
+<br />
+SELECTION-SCREEN END OF BLOCK B2.<br />
+<br />
+<br />
+<br />
+SELECTION-SCREEN BEGIN OF BLOCK B3 WITH FRAME.<br />
+<br />
+"   ######<br />
+PARAMETERS : P_BAKLST AS CHECKBOX DEFAULT 'X'.<br />
+<br />
+SELECTION-SCREEN END OF BLOCK B3.<br />
+<br />
+<br />
+INITIALIZATION.<br />
+S_ZJDATE-LOW = SY-DATUM(6) && '01'.<br />
+<br />
+"   #### ###<br />
+IF SY-DATUM+4(2) = '01' OR SY-DATUM+4(2) = '03' OR SY-DATUM+4(2) = '05' OR<br />
+&nbsp;&nbsp;SY-DATUM+4(2)&nbsp;=&nbsp;'07'&nbsp;OR&nbsp;SY-DATUM+4(2)&nbsp;=&nbsp;'08'&nbsp;OR&nbsp;SY-DATUM+4(2)&nbsp;=&nbsp;'10'&nbsp;OR<br />
+&nbsp;&nbsp;SY-DATUM+4(2)&nbsp;=&nbsp;'12'.<br />
+&nbsp;&nbsp;S_ZJDATE-HIGH&nbsp;=&nbsp;SY-DATUM(6)&nbsp;&&&nbsp;'31'.<br />
+ELSEIF SY-DATUM+4(2) = '02'.<br />
+&nbsp;&nbsp;S_ZJDATE-HIGH&nbsp;=&nbsp;SY-DATUM(6)&nbsp;&&&nbsp;'28'.<br />
+ELSE.<br />
+&nbsp;&nbsp;S_ZJDATE-HIGH&nbsp;=&nbsp;SY-DATUM(6)&nbsp;&&&nbsp;'30'.<br />
+ENDIF.<br />
+S_ZJDATE-SIGN = 'I'.<br />
+S_ZJDATE-OPTION = 'BT'.<br />
+<br />
+APPEND S_ZJDATE.<br />
+<br />
+"   #### ###<br />
+S_ZDDATE-LOW = SY-DATUM(6) && '01'.<br />
+IF SY-DATUM+4(2) = '01' OR SY-DATUM+4(2) = '03' OR SY-DATUM+4(2) = '05' OR<br />
+&nbsp;&nbsp;SY-DATUM+4(2)&nbsp;=&nbsp;'07'&nbsp;OR&nbsp;SY-DATUM+4(2)&nbsp;=&nbsp;'08'&nbsp;OR&nbsp;SY-DATUM+4(2)&nbsp;=&nbsp;'10'&nbsp;OR<br />
+&nbsp;&nbsp;SY-DATUM+4(2)&nbsp;=&nbsp;'12'.<br />
+&nbsp;&nbsp;S_ZDDATE-HIGH&nbsp;=&nbsp;SY-DATUM(6)&nbsp;&&&nbsp;'31'.<br />
+ELSEIF SY-DATUM+4(2) = '02'.<br />
+&nbsp;&nbsp;S_ZDDATE-HIGH&nbsp;=&nbsp;SY-DATUM(6)&nbsp;&&&nbsp;'28'.<br />
+ELSE.<br />
+&nbsp;&nbsp;S_ZDDATE-HIGH&nbsp;=&nbsp;SY-DATUM(6)&nbsp;&&&nbsp;'30'.<br />
+ENDIF.<br />
+S_ZDDATE-SIGN = 'I'.<br />
+S_ZDDATE-OPTION = 'BT'.<br />
+<br />
+APPEND S_ZDDATE.<br />
+<br />
+AT SELECTION-SCREEN OUTPUT.<br />
+&nbsp;&nbsp;LOOP&nbsp;AT&nbsp;SCREEN.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;IF&nbsp;SCREEN-GROUP1&nbsp;=&nbsp;'M1'.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;IF&nbsp;P_ORDER&nbsp;=&nbsp;'X'.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SCREEN-ACTIVE&nbsp;=&nbsp;'1'.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ELSE.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SCREEN-ACTIVE&nbsp;=&nbsp;'0'.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ENDIF.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;ELSEIF&nbsp;SCREEN-GROUP1&nbsp;=&nbsp;'M2'.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;IF&nbsp;P_DLVRY&nbsp;=&nbsp;'X'.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SCREEN-ACTIVE&nbsp;=&nbsp;'1'.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ELSE.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SCREEN-ACTIVE&nbsp;=&nbsp;'0'.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ENDIF.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;ENDIF.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;MODIFY&nbsp;SCREEN.<br />
+ENDLOOP.<br />
+<br />
+<br />
+<br />
+<br />
+START-OF-SELECTION.<br />
+&nbsp;&nbsp;PERFORM&nbsp;GET_DATA.<br />
+&nbsp;&nbsp;PERFORM&nbsp;MODIFY_DATA.<br />
+<br />
+END-OF-SELECTION.<br />
+&nbsp;&nbsp;PERFORM&nbsp;WRITE_DATA.<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+FORM GET_DATA.<br />
+&nbsp;&nbsp;SELECT&nbsp;*&nbsp;FROM&nbsp;ZEDT10_100<br />
+&nbsp;&nbsp;&nbsp;&nbsp;INTO&nbsp;CORRESPONDING&nbsp;FIELDS&nbsp;OF&nbsp;TABLE&nbsp;GT_ORDER<br />
+&nbsp;&nbsp;&nbsp;&nbsp;WHERE&nbsp;ZORDNO&nbsp;IN&nbsp;S_ZORDNO&nbsp;AND<br />
+&nbsp;&nbsp;&nbsp;&nbsp;ZIDCODE&nbsp;IN&nbsp;S_ZID&nbsp;AND<br />
+&nbsp;&nbsp;&nbsp;&nbsp;ZMATNR&nbsp;IN&nbsp;S_ZMATNR&nbsp;&nbsp;AND<br />
+&nbsp;&nbsp;&nbsp;&nbsp;ZJDATE&nbsp;IN&nbsp;S_ZJDATE.<br />
+<br />
+<br />
+"   RANGE ## ### ##<br />
+RANGES GR_DLVRY FOR ZEDT10_101-ZFLAG.<br />
+<br />
+GR_DLVRY-SIGN = 'I'.<br />
+GR_DLVRY-OPTION = 'EQ'.<br />
+<br />
+IF P_BAKLST = 'X'.<br />
+&nbsp;&nbsp;GR_DLVRY-LOW&nbsp;=&nbsp;'X'.<br />
+ELSE.<br />
+&nbsp;&nbsp;GR_DLVRY-LOW&nbsp;=&nbsp;'&nbsp;'&nbsp;.<br />
+ENDIF.<br />
+<br />
+<br />
+&nbsp;&nbsp;SELECT&nbsp;*&nbsp;FROM&nbsp;ZEDT10_101<br />
+&nbsp;&nbsp;&nbsp;&nbsp;INTO&nbsp;CORRESPONDING&nbsp;FIELDS&nbsp;OF&nbsp;TABLE&nbsp;GT_DLVRY<br />
+&nbsp;&nbsp;&nbsp;&nbsp;WHERE&nbsp;ZORDNO&nbsp;IN&nbsp;S_ZORDNO&nbsp;AND<br />
+&nbsp;&nbsp;&nbsp;&nbsp;ZIDCODE&nbsp;IN&nbsp;S_ZID&nbsp;AND<br />
+&nbsp;&nbsp;&nbsp;&nbsp;ZMATNR&nbsp;IN&nbsp;S_ZMATNR&nbsp;&nbsp;AND<br />
+&nbsp;&nbsp;&nbsp;&nbsp;ZDDATE&nbsp;IN&nbsp;S_ZDDATE&nbsp;AND<br />
+&nbsp;&nbsp;&nbsp;&nbsp;ZFLAG&nbsp;IN&nbsp;GR_DLVRY.<br />
+<br />
+ENDFORM.<br />
+<br />
+<br />
+FORM MODIFY_DATA.<br />
+<br />
+"   ## ##<br />
+LOOP AT GT_ORDER INTO GS_ORDER.<br />
+<br />
+&nbsp;&nbsp;CLEAR&nbsp;:&nbsp;GS_WRITE1.<br />
+<br />
+&nbsp;&nbsp;MOVE-CORRESPONDING&nbsp;GS_ORDER&nbsp;TO&nbsp;GS_WRITE1.<br />
+<br />
+&nbsp;&nbsp;IF&nbsp;GS_WRITE1-ZMTART&nbsp;=&nbsp;'001'.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;GS_WRITE1-P_TYPE&nbsp;=&nbsp;'##'.<br />
+&nbsp;&nbsp;ELSEIF&nbsp;GS_WRITE1-ZMTART&nbsp;=&nbsp;'002'.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;GS_WRITE1-P_TYPE&nbsp;=&nbsp;'##'.<br />
+&nbsp;&nbsp;ELSEIF&nbsp;GS_WRITE1-ZMTART&nbsp;=&nbsp;'003'.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;GS_WRITE1-P_TYPE&nbsp;=&nbsp;'##'.<br />
+&nbsp;&nbsp;ELSEIF&nbsp;GS_WRITE1-ZMTART&nbsp;=&nbsp;'004'.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;GS_WRITE1-P_TYPE&nbsp;=&nbsp;'##'.<br />
+&nbsp;&nbsp;ELSEIF&nbsp;GS_WRITE1-ZMTART&nbsp;=&nbsp;'005'.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;GS_WRITE1-P_TYPE&nbsp;=&nbsp;'##'.<br />
+&nbsp;&nbsp;&nbsp;ELSEIF&nbsp;GS_WRITE1-ZMTART&nbsp;=&nbsp;'006'.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;GS_WRITE1-P_TYPE&nbsp;=&nbsp;'###'.<br />
+&nbsp;&nbsp;ENDIF.<br />
+<br />
+&nbsp;&nbsp;IF&nbsp;GS_WRITE1-ZDC_FG&nbsp;=&nbsp;'1'.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;GS_WRITE1-SALE_TYPE&nbsp;=&nbsp;'#####'.<br />
+&nbsp;&nbsp;ELSEIF&nbsp;GS_WRITE1-ZDC_FG&nbsp;=&nbsp;'2'.<br />
+&nbsp;&nbsp;&nbsp;GS_WRITE1-SALE_TYPE&nbsp;=&nbsp;'######'.<br />
+&nbsp;&nbsp;ELSEIF&nbsp;GS_WRITE1-ZDC_FG&nbsp;=&nbsp;'3'.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;GS_WRITE1-SALE_TYPE&nbsp;=&nbsp;'####'.<br />
+&nbsp;&nbsp;ELSEIF&nbsp;GS_WRITE1-ZDC_FG&nbsp;=&nbsp;'4'.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;GS_WRITE1-SALE_TYPE&nbsp;=&nbsp;'####'.<br />
+&nbsp;&nbsp;ENDIF.<br />
+<br />
+&nbsp;&nbsp;IF&nbsp;GS_WRITE1-ZSALE_FG&nbsp;=&nbsp;'1'.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;GS_WRITE1-SELL_TYPE&nbsp;=&nbsp;'##'.<br />
+&nbsp;&nbsp;ELSEIF&nbsp;GS_WRITE1-ZSALE_FG&nbsp;=&nbsp;'2'.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;GS_WRITE1-SELL_TYPE&nbsp;=&nbsp;'##'.<br />
+&nbsp;&nbsp;ENDIF.<br />
+<br />
+&nbsp;&nbsp;&nbsp;IF&nbsp;GS_WRITE1-ZRET_FG&nbsp;=&nbsp;'1'.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;GS_WRITE1-RETURNS_TYPE&nbsp;=&nbsp;'####'.<br />
+&nbsp;&nbsp;&nbsp;ELSEIF&nbsp;GS_WRITE1-ZRET_FG&nbsp;=&nbsp;'2'.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;GS_WRITE1-RETURNS_TYPE&nbsp;=&nbsp;'####'.<br />
+&nbsp;&nbsp;&nbsp;ELSEIF&nbsp;GS_WRITE1-ZRET_FG&nbsp;=&nbsp;'3'.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;GS_WRITE1-RETURNS_TYPE&nbsp;=&nbsp;'####'.<br />
+&nbsp;&nbsp;&nbsp;ENDIF.<br />
+<br />
+<br />
+&nbsp;&nbsp;&nbsp;GS_WRITE1-PRICE1&nbsp;=&nbsp;GS_WRITE1-ZNSAMT&nbsp;*&nbsp;C_RATE.<br />
+&nbsp;&nbsp;&nbsp;GS_WRITE1-PRICE2&nbsp;=&nbsp;GS_WRITE1-ZSLAMT&nbsp;*&nbsp;C_RATE.<br />
+&nbsp;&nbsp;&nbsp;GS_WRITE1-PRICE3&nbsp;=&nbsp;GS_WRITE1-ZDCAMT&nbsp;*&nbsp;C_RATE.<br />
+<br />
+&nbsp;&nbsp;APPEND&nbsp;GS_WRITE1&nbsp;TO&nbsp;GT_WRITE1.<br />
+<br />
+ENDLOOP.<br />
+<br />
+"   ## ##<br />
+LOOP AT GT_DLVRY INTO GS_DLVRY.<br />
+<br />
+&nbsp;&nbsp;&nbsp;CLEAR&nbsp;:&nbsp;GS_WRITE2.<br />
+<br />
+&nbsp;&nbsp;&nbsp;MOVE-CORRESPONDING&nbsp;GS_DLVRY&nbsp;TO&nbsp;GS_WRITE2.<br />
+<br />
+&nbsp;&nbsp;IF&nbsp;GS_WRITE2-ZMTART&nbsp;=&nbsp;'001'.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;GS_WRITE2-P_TYPE&nbsp;=&nbsp;'##'.<br />
+&nbsp;&nbsp;ELSEIF&nbsp;GS_WRITE2-ZMTART&nbsp;=&nbsp;'002'.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;GS_WRITE2-P_TYPE&nbsp;=&nbsp;'##'.<br />
+&nbsp;&nbsp;ELSEIF&nbsp;GS_WRITE2-ZMTART&nbsp;=&nbsp;'003'.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;GS_WRITE2-P_TYPE&nbsp;=&nbsp;'##'.<br />
+&nbsp;&nbsp;ELSEIF&nbsp;GS_WRITE2-ZMTART&nbsp;=&nbsp;'004'.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;GS_WRITE2-P_TYPE&nbsp;=&nbsp;'##'.<br />
+&nbsp;&nbsp;ELSEIF&nbsp;GS_WRITE2-ZMTART&nbsp;=&nbsp;'005'.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;GS_WRITE2-P_TYPE&nbsp;=&nbsp;'##'.<br />
+&nbsp;&nbsp;&nbsp;ELSEIF&nbsp;GS_WRITE2-ZMTART&nbsp;=&nbsp;'006'.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;GS_WRITE2-P_TYPE&nbsp;=&nbsp;'###'.<br />
+&nbsp;&nbsp;ENDIF.<br />
+<br />
+&nbsp;&nbsp;IF&nbsp;GS_WRITE2-ZDFLAG&nbsp;=&nbsp;'1'.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;GS_WRITE2-DLVRY_POS&nbsp;='####'.<br />
+&nbsp;&nbsp;ELSEIF&nbsp;GS_WRITE2-ZDFLAG&nbsp;=&nbsp;'2'.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;GS_WRITE2-DLVRY_POS&nbsp;='###'.<br />
+&nbsp;&nbsp;ELSEIF&nbsp;GS_WRITE2-ZDFLAG&nbsp;=&nbsp;'3'.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;GS_WRITE2-DLVRY_POS&nbsp;='####'.<br />
+&nbsp;&nbsp;ENDIF.<br />
+<br />
+   </div>
+   <div class="codeComment">
+*&nbsp;&nbsp;BREAK-POINT.<br />
+<br />
+   </div>
+   <div class="code">
+&nbsp;&nbsp;&nbsp;IF&nbsp;GS_WRITE2-ZDGUBUN&nbsp;=&nbsp;'1'.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;GS_WRITE2-REGION&nbsp;='###'.<br />
+&nbsp;&nbsp;&nbsp;ELSEIF&nbsp;GS_WRITE2-ZDGUBUN&nbsp;=&nbsp;'2'.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;GS_WRITE2-REGION&nbsp;='###'.<br />
+&nbsp;&nbsp;&nbsp;ELSEIF&nbsp;GS_WRITE2-ZDGUBUN&nbsp;=&nbsp;'3'.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;GS_WRITE2-REGION&nbsp;='###'.<br />
+&nbsp;&nbsp;&nbsp;ELSEIF&nbsp;GS_WRITE2-ZDGUBUN&nbsp;=&nbsp;'4'.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;GS_WRITE2-REGION&nbsp;='###'.<br />
+&nbsp;&nbsp;&nbsp;ELSEIF&nbsp;GS_WRITE2-ZDGUBUN&nbsp;=&nbsp;'5'.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;GS_WRITE2-REGION&nbsp;='###'.<br />
+&nbsp;&nbsp;&nbsp;ELSEIF&nbsp;GS_WRITE2-ZDGUBUN&nbsp;=&nbsp;'6'.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;GS_WRITE2-REGION&nbsp;='###'.<br />
+&nbsp;&nbsp;&nbsp;ELSEIF&nbsp;GS_WRITE2-ZDGUBUN&nbsp;=&nbsp;'7'.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;GS_WRITE2-REGION&nbsp;='###'.<br />
+&nbsp;&nbsp;&nbsp;ENDIF.<br />
+<br />
+&nbsp;&nbsp;&nbsp;GS_WRITE2-PRICE1&nbsp;=&nbsp;GS_WRITE2-ZSLAMT&nbsp;*&nbsp;C_RATE.<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;APPEND&nbsp;GS_WRITE2&nbsp;TO&nbsp;GT_WRITE2.<br />
+<br />
+<br />
+ENDLOOP.<br />
+<br />
+<br />
+<br />
+<br />
+ENDFORM.<br />
+<br />
+<br />
+<br />
+FORM WRITE_DATA.<br />
+<br />
+"   ## ## ##<br />
+IF P_ORDER = 'X'.<br />
+<br />
+&nbsp;&nbsp;IF&nbsp;P_BAKLST&nbsp;=&nbsp;'X'.<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;LOOP&nbsp;AT&nbsp;GT_WRITE1&nbsp;INTO&nbsp;GS_WRITE1.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AT&nbsp;FIRST.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;WRITE&nbsp;:&nbsp;/&nbsp;'--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------'.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;WRITE&nbsp;:&nbsp;/&nbsp;'|&nbsp;&nbsp;####&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ID&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;####&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;###&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;####&nbsp;|##&nbsp;|##&nbsp;|&nbsp;&nbsp;####&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;####&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;####&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;##&nbsp;&nbsp;|&nbsp;&nbsp;####&nbsp;&nbsp;|&nbsp;&nbsp;####&nbsp;&nbsp;|&nbsp;&nbsp;####&nbsp;&nbsp;|'.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;WRITE&nbsp;:&nbsp;/&nbsp;'--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------'.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ENDAT.<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;IF&nbsp;GS_WRITE1-ZRDATE&nbsp;IS&nbsp;NOT&nbsp;INITIAL.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;WRITE&nbsp;:&nbsp;/&nbsp;'|',&nbsp;GS_WRITE1-ZORDNO,'|',&nbsp;GS_WRITE1-ZIDCODE,'|',&nbsp;GS_WRITE1-ZMATNR,&nbsp;'|',&nbsp;GS_WRITE1-ZMATNAME,&nbsp;'|&nbsp;',&nbsp;GS_WRITE1-P_TYPE,&nbsp;&nbsp;'&nbsp;|',GS_WRITE1-ZVOLUM,&nbsp;'|',&nbsp;GS_WRITE1-VRKME,&nbsp;'|',<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GS_WRITE1-PRICE1,&nbsp;&nbsp;'|',&nbsp;GS_WRITE1-PRICE2,&nbsp;'|',&nbsp;GS_WRITE1-PRICE3,&nbsp;'|',GS_WRITE1-SELL_TYPE,&nbsp;'|',&nbsp;GS_WRITE1-ZJDATE,&nbsp;'|',&nbsp;GS_WRITE1-RETURNS_TYPE,&nbsp;'&nbsp;&nbsp;|',&nbsp;GS_WRITE1-ZRDATE,&nbsp;'|'.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ELSE.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;WRITE&nbsp;:&nbsp;/&nbsp;'|',&nbsp;GS_WRITE1-ZORDNO,'|',&nbsp;GS_WRITE1-ZIDCODE,'|',&nbsp;GS_WRITE1-ZMATNR,&nbsp;'|',&nbsp;GS_WRITE1-ZMATNAME,&nbsp;'|&nbsp;',&nbsp;GS_WRITE1-P_TYPE,&nbsp;&nbsp;'&nbsp;|',GS_WRITE1-ZVOLUM,&nbsp;'|',&nbsp;GS_WRITE1-VRKME,&nbsp;'|',<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GS_WRITE1-PRICE1,&nbsp;&nbsp;'|',&nbsp;GS_WRITE1-PRICE2,&nbsp;'|',&nbsp;GS_WRITE1-PRICE3,&nbsp;'|',GS_WRITE1-SELL_TYPE,&nbsp;'|',&nbsp;GS_WRITE1-ZJDATE,&nbsp;'|',&nbsp;GS_WRITE1-RETURNS_TYPE,&nbsp;'&nbsp;&nbsp;|',&nbsp;&nbsp;'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|'.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ENDIF.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;WRITE&nbsp;:&nbsp;/&nbsp;'--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------'.<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;ENDLOOP.<br />
+<br />
+&nbsp;&nbsp;ELSE.<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;LOOP&nbsp;AT&nbsp;GT_WRITE1&nbsp;INTO&nbsp;GS_WRITE1.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AT&nbsp;FIRST.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;WRITE&nbsp;:&nbsp;/&nbsp;'------------------------------------------------------------------------------------------------------------------------------------------------------'.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;WRITE&nbsp;:&nbsp;/&nbsp;'|&nbsp;&nbsp;####&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ID&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;####&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;###&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;####&nbsp;|##&nbsp;|##&nbsp;|&nbsp;&nbsp;####&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;####&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;####&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;##&nbsp;&nbsp;|&nbsp;&nbsp;####&nbsp;&nbsp;|'.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;WRITE&nbsp;:&nbsp;/&nbsp;'------------------------------------------------------------------------------------------------------------------------------------------------------'.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ENDAT.<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;IF&nbsp;GS_WRITE1-ZSALE_FG&nbsp;=&nbsp;1.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;WRITE&nbsp;:&nbsp;/&nbsp;'|',&nbsp;GS_WRITE1-ZORDNO,'|',&nbsp;GS_WRITE1-ZIDCODE,'|',&nbsp;GS_WRITE1-ZMATNR,&nbsp;'|',&nbsp;GS_WRITE1-ZMATNAME,&nbsp;'|&nbsp;',&nbsp;GS_WRITE1-P_TYPE,&nbsp;&nbsp;'&nbsp;|',GS_WRITE1-ZVOLUM,&nbsp;'|',&nbsp;GS_WRITE1-VRKME,&nbsp;'|',<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GS_WRITE1-PRICE1,&nbsp;&nbsp;'|',&nbsp;GS_WRITE1-PRICE2,&nbsp;'|',&nbsp;GS_WRITE1-PRICE3,&nbsp;'|',GS_WRITE1-SELL_TYPE,&nbsp;'|',&nbsp;GS_WRITE1-ZJDATE,&nbsp;'|'.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;WRITE&nbsp;:&nbsp;/&nbsp;'------------------------------------------------------------------------------------------------------------------------------------------------------'.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ENDIF.<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;ENDLOOP.<br />
+<br />
+<br />
+&nbsp;&nbsp;ENDIF.<br />
+<br />
+<br />
+"   ## ## ##<br />
+<br />
+ELSEIF P_DLVRY = 'X'.<br />
+<br />
+&nbsp;&nbsp;CLEAR&nbsp;:&nbsp;GS_WRITE2.<br />
+<br />
+&nbsp;&nbsp;"&nbsp;######<br />
+<br />
+&nbsp;&nbsp;IF&nbsp;P_BAKLST&nbsp;=&nbsp;'X'.<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;LOOP&nbsp;AT&nbsp;GT_WRITE2&nbsp;INTO&nbsp;GS_WRITE2.<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AT&nbsp;FIRST.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;WRITE&nbsp;:&nbsp;/&nbsp;'--------------------------------------------------------------------------------------------------------------------------------------------------'.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;WRITE&nbsp;:&nbsp;/&nbsp;'|&nbsp;&nbsp;####&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ID&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;####&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;###&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;####&nbsp;|##&nbsp;|##&nbsp;|&nbsp;&nbsp;####&nbsp;&nbsp;&nbsp;|&nbsp;####&nbsp;|&nbsp;&nbsp;##&nbsp;&nbsp;|&nbsp;&nbsp;####&nbsp;&nbsp;|&nbsp;&nbsp;####&nbsp;&nbsp;|'.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;WRITE&nbsp;:&nbsp;/&nbsp;'--------------------------------------------------------------------------------------------------------------------------------------------------'.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ENDAT.<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;IF&nbsp;GS_WRITE2-ZRDATE&nbsp;IS&nbsp;NOT&nbsp;INITIAL.<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;WRITE&nbsp;:&nbsp;/&nbsp;'|',&nbsp;GS_WRITE2-ZORDNO,'|',&nbsp;GS_WRITE2-ZIDCODE,'|',&nbsp;GS_WRITE2-ZMATNR,&nbsp;'|',&nbsp;GS_WRITE2-ZMATNAME,&nbsp;'|&nbsp;',&nbsp;GS_WRITE2-P_TYPE,&nbsp;&nbsp;'&nbsp;|',GS_WRITE2-ZVOLUM,&nbsp;'|',&nbsp;GS_WRITE2-VRKME,&nbsp;'|',<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GS_WRITE2-PRICE1,&nbsp;&nbsp;'|',GS_WRITE2-DLVRY_POS,&nbsp;'|',&nbsp;GS_WRITE2-REGION,&nbsp;'|',&nbsp;GS_WRITE2-ZDDATE,&nbsp;'|',&nbsp;GS_WRITE2-ZRDATE,&nbsp;'|'.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ELSE.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;WRITE&nbsp;:&nbsp;/&nbsp;'|',&nbsp;GS_WRITE2-ZORDNO,'|',&nbsp;GS_WRITE2-ZIDCODE,'|',&nbsp;GS_WRITE2-ZMATNR,&nbsp;'|',&nbsp;GS_WRITE2-ZMATNAME,&nbsp;'|&nbsp;',&nbsp;GS_WRITE2-P_TYPE,&nbsp;&nbsp;'&nbsp;|',GS_WRITE2-ZVOLUM,&nbsp;'|',&nbsp;GS_WRITE2-VRKME,&nbsp;'|',<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GS_WRITE2-PRICE1,&nbsp;&nbsp;'|',GS_WRITE2-DLVRY_POS,&nbsp;'|',&nbsp;GS_WRITE2-REGION,&nbsp;'|',&nbsp;GS_WRITE2-ZDDATE,&nbsp;'|',&nbsp;'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|'.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ENDIF.<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;WRITE&nbsp;:&nbsp;/&nbsp;'--------------------------------------------------------------------------------------------------------------------------------------------------'.<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CLEAR&nbsp;:&nbsp;GS_WRITE2.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;ENDLOOP.<br />
+<br />
+<br />
+" #### ###<br />
+&nbsp;&nbsp;ELSE.<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;LOOP&nbsp;AT&nbsp;GT_WRITE2&nbsp;INTO&nbsp;GS_WRITE2.<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AT&nbsp;FIRST.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;WRITE&nbsp;:&nbsp;/&nbsp;'-------------------------------------------------------------------------------------------------------------------------------------'.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;WRITE&nbsp;:&nbsp;/&nbsp;'|&nbsp;&nbsp;####&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ID&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;####&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;###&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;####&nbsp;|##&nbsp;|##&nbsp;|&nbsp;&nbsp;####&nbsp;&nbsp;&nbsp;|&nbsp;####&nbsp;|&nbsp;&nbsp;##&nbsp;&nbsp;|&nbsp;&nbsp;####&nbsp;&nbsp;|'.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;WRITE&nbsp;:&nbsp;/&nbsp;'-------------------------------------------------------------------------------------------------------------------------------------'.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ENDAT.<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;IF&nbsp;GS_WRITE2-ZFLAG&nbsp;IS&nbsp;INITIAL.<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;WRITE&nbsp;:&nbsp;/&nbsp;'|',&nbsp;GS_WRITE2-ZORDNO,'|',&nbsp;GS_WRITE2-ZIDCODE,'|',&nbsp;GS_WRITE2-ZMATNR,&nbsp;'|',&nbsp;GS_WRITE2-ZMATNAME,&nbsp;'|&nbsp;',&nbsp;GS_WRITE2-P_TYPE,&nbsp;&nbsp;'&nbsp;|',GS_WRITE2-ZVOLUM,&nbsp;'|',&nbsp;GS_WRITE2-VRKME,&nbsp;'|',<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GS_WRITE2-PRICE1,&nbsp;&nbsp;'|',GS_WRITE2-DLVRY_POS,&nbsp;'|',&nbsp;GS_WRITE2-REGION,&nbsp;'|',&nbsp;GS_WRITE2-ZDDATE,&nbsp;'|'.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;WRITE&nbsp;:&nbsp;/&nbsp;'-------------------------------------------------------------------------------------------------------------------------------------'.<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ENDIF.<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CLEAR&nbsp;:&nbsp;GS_WRITE2.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;ENDLOOP.<br />
+<br />
+&nbsp;&nbsp;ENDIF.<br />
+<br />
+<br />
+ENDIF.<br />
+<br />
+ENDFORM.<br />
+<br />
+<br />
+   </div>
+   <div class="codeComment">
+*Selection&nbsp;texts<br />
+*----------------------------------------------------------<br />
+*&nbsp;P_BAKLST&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;######<br />
+*&nbsp;P_DLVRY&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;####<br />
+*&nbsp;P_ORDER&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;####<br />
+*&nbsp;S_ZDDATE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;####<br />
+*&nbsp;S_ZID&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;##ID<br />
+*&nbsp;S_ZJDATE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;####<br />
+*&nbsp;S_ZMATNR&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;####<br />
+*&nbsp;S_ZORDNO&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;####<br />
+            </div>
+          </td>
+        </tr>
+      </table>
+      </td>
+      </tr>
+   <tr>
+<td class="footer">Extracted by Mass Download version 1.4.6 - E.G.Mellodew. 1998-2025. Sap Release 750</td>
+   </tr>
+</table>
+</body>
+</html>

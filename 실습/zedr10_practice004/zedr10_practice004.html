@@ -1,0 +1,239 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="application/xhtml+xml; charset=EUC-KR" />
+<title>ZEDR10_PRACTICE004</title>
+<style type="text/css">
+.code{ font-family:"Courier New", Courier, monospace; color:#000; font-size:14px; background-color:#F2F4F7 }
+  .codeComment {font-family:"Courier New", Courier, monospace; color:#0000F0; font-size:14px; background-color:#F2F4F7 }
+  .normalBold{ font-family:Arial, Helvetica, sans-serif; color:#000; font-size:12px; font-weight:800 }
+  .normalBoldLarge{ font-family:Arial, Helvetica, sans-serif; color:#000; font-size:16px; font-weight:800 }
+</style>
+<style type="text/css">
+  .normal{ font-family:Arial, Helvetica, sans-serif; color:#000; font-size:12px }
+  .footer{ font-family:Arial, Helvetica, sans-serif; color:#000; font-size:12px; text-align: center }
+  h2{ font-family:Arial, Helvetica, sans-serif; color:#000; font-size:16px; font-weight:800 }
+  h3{ font-family:Arial, Helvetica, sans-serif; color:#000; font-size:14px; font-weight:800 }
+  .outerTable{
+   background-color:#E0E7ED;
+   width:100%;
+   border-top-width: thin;
+   border-right-width: thin;
+   border-right-width: thin;
+   border-left-width: thin;
+   border-top-style: solid;
+   border-right-style: solid;
+   border-bottom-style: solid;
+   border-left-style: solid;
+  }
+  .innerTable{
+   background-color:#F2F4F7;
+   width:100%;
+   border-top-width: thin;
+   border-right-width: thin;
+   border-bottom-width: thin;
+   border-left-width: thin;
+   border-top-style: solid;
+   border-right-style: solid;
+   border-bottom-style: solid;
+   border-left-style: solid;
+  }
+</style>
+</head>
+<body>
+<table class="outerTable">
+  <tr class="normalBoldLarge">
+     <td><h2>Code listing for: ZEDR10_PRACTICE004</h2>
+<h3> Description: FUNCTION ## (4/14)</h3></td>
+   </tr>
+  <tr>
+     <td>
+     <table class="innerTable">
+       <tr>
+          <td>
+   <div class="codeComment">
+*&---------------------------------------------------------------------*<br />
+*&&nbsp;Report&nbsp;ZEDR10_PRACTICE004<br />
+*&---------------------------------------------------------------------*<br />
+*&<br />
+*&---------------------------------------------------------------------*<br />
+   </div>
+   <div class="code">
+REPORT ZEDR10_PRACTICE004.<br />
+<br />
+RANGES : GR_ZCODE FOR ZEDT10_001-ZCODE.<br />
+<br />
+GR_ZCODE-SIGN = 'I'.<br />
+GR_ZCODE-OPTION = 'BT'.<br />
+GR_ZCODE-LOW = 'SSU-90'.<br />
+GR_ZCODE-HIGH = 'SSU-99'.<br />
+APPEND GR_ZCODE.<br />
+<br />
+DATA : BEGIN OF GS_STUDENT.<br />
+&nbsp;&nbsp;include&nbsp;structure&nbsp;<a&nbsp;href&nbsp;="zedt10_001/dictionary-zedt10_001.html">ZEDT10_001</a>.<br />
+DATA : END OF GS_STUDENT.<br />
+DATA : GT_STUDENT LIKE TABLE OF GS_STUDENT.<br />
+<br />
+   </div>
+   <div class="codeComment">
+**&nbsp;"&nbsp;&nbsp;##&nbsp;###&nbsp;##<br />
+**DELETE&nbsp;&nbsp;FROM&nbsp;ZEDT10_001.<br />
+**<br />
+**&nbsp;###&nbsp;###&nbsp;##<br />
+**PERFORM&nbsp;INSERT_TABLE.<br />
+<br />
+<br />
+<br />
+   </div>
+   <div class="code">
+"   ZEDT10_001## ZCODE : SSU-90 ~ SSU-99# # ####<br />
+SELECT * FROM ZEDT10_001<br />
+&nbsp;&nbsp;INTO&nbsp;CORRESPONDING&nbsp;FIELDS&nbsp;OF&nbsp;TABLE&nbsp;GT_STUDENT<br />
+&nbsp;&nbsp;WHERE&nbsp;ZCODE&nbsp;IN&nbsp;GR_ZCODE.<br />
+<br />
+DATA : GV_CHANGED TYPE C LENGTH 10.<br />
+<br />
+<br />
+&nbsp;&nbsp;&nbsp;"FUNCTION#&nbsp;####&nbsp;ZEPRNR#&nbsp;###&nbsp;##&nbsp;0&nbsp;#####&nbsp;##<br />
+LOOP AT GT_STUDENT INTO GS_STUDENT.<br />
+&nbsp;&nbsp;call&nbsp;function&nbsp;<a&nbsp;href&nbsp;="zed10_fill_zpernr/zed10_fill_zpernr.html">'ZED10_FILL_ZPERNR'</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;EXPORTING<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;in_zpernr&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;GS_STUDENT-ZPERNR<br />
+&nbsp;&nbsp;&nbsp;IMPORTING<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;OUT_ZPERNR&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;GS_STUDENT-ZPERNR.<br />
+<br />
+&nbsp;&nbsp;MODIFY&nbsp;GT_STUDENT&nbsp;FROM&nbsp;GS_STUDENT&nbsp;INDEX&nbsp;SY-TABIX.<br />
+&nbsp;&nbsp;CLEAR&nbsp;GS_STUDENT.<br />
+ENDLOOP.<br />
+<br />
+MODIFY ZEDT10_001 FROM TABLE GT_STUDENT.<br />
+<br />
+&nbsp;&nbsp;IF&nbsp;SY-SUBRC&nbsp;=&nbsp;0.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;WRITE&nbsp;:/&nbsp;'##'.<br />
+&nbsp;&nbsp;ENDIF.<br />
+<br />
+<br />
+<br />
+   </div>
+   <div class="codeComment">
+*INITIALIZATION.<br />
+*<br />
+*<br />
+*<br />
+*START-OF-SELECTION.<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+   </div>
+   <div class="code">
+FORM INSERT_TABLE.<br />
+<br />
+CLEAR : GS_STUDENT.<br />
+GS_STUDENT-ZPERNR = '90'.<br />
+GS_STUDENT-ZCODE = 'SSU-90'.<br />
+GS_STUDENT-ZKNAME = '###'.<br />
+GS_STUDENT-ZENAME = 'KKK'.<br />
+GS_STUDENT-ZGENDER = 'F'.<br />
+GS_STUDENT-ZTEL = '00000000001'.<br />
+APPEND GS_STUDENT TO GT_STUDENT.<br />
+<br />
+CLEAR : GS_STUDENT.<br />
+GS_STUDENT-ZPERNR = '91'.<br />
+GS_STUDENT-ZCODE = 'SSU-91'.<br />
+GS_STUDENT-ZKNAME = '###'.<br />
+GS_STUDENT-ZENAME = 'NNN'.<br />
+GS_STUDENT-ZGENDER = 'F'.<br />
+GS_STUDENT-ZTEL = '11111111111'.<br />
+APPEND GS_STUDENT TO GT_STUDENT.<br />
+<br />
+CLEAR : GS_STUDENT.<br />
+GS_STUDENT-ZPERNR = '92'.<br />
+GS_STUDENT-ZCODE = 'SSU-92'.<br />
+GS_STUDENT-ZKNAME = '###'.<br />
+GS_STUDENT-ZENAME = 'DDD'.<br />
+GS_STUDENT-ZGENDER = 'M'.<br />
+GS_STUDENT-ZTEL = '22222222222'.<br />
+APPEND GS_STUDENT TO GT_STUDENT.<br />
+<br />
+CLEAR : GS_STUDENT.<br />
+GS_STUDENT-ZPERNR = '93'.<br />
+GS_STUDENT-ZCODE = 'SSU-93'.<br />
+GS_STUDENT-ZKNAME = '###'.<br />
+GS_STUDENT-ZENAME = 'RRR'.<br />
+GS_STUDENT-ZGENDER = 'M'.<br />
+GS_STUDENT-ZTEL = '33333333333'.<br />
+APPEND GS_STUDENT TO GT_STUDENT.<br />
+<br />
+CLEAR : GS_STUDENT.<br />
+GS_STUDENT-ZPERNR = '94'.<br />
+GS_STUDENT-ZCODE = 'SSU-94'.<br />
+GS_STUDENT-ZKNAME = '###'.<br />
+GS_STUDENT-ZENAME = 'MMM'.<br />
+GS_STUDENT-ZGENDER = 'M'.<br />
+GS_STUDENT-ZTEL = '44444444444'.<br />
+APPEND GS_STUDENT TO GT_STUDENT.<br />
+<br />
+CLEAR : GS_STUDENT.<br />
+GS_STUDENT-ZPERNR = '95'.<br />
+GS_STUDENT-ZCODE = 'SSU-95'.<br />
+GS_STUDENT-ZKNAME = '###'.<br />
+GS_STUDENT-ZENAME = 'BBB'.<br />
+GS_STUDENT-ZGENDER = 'M'.<br />
+GS_STUDENT-ZTEL = '55555555555'.<br />
+APPEND GS_STUDENT TO GT_STUDENT.<br />
+<br />
+CLEAR : GS_STUDENT.<br />
+GS_STUDENT-ZPERNR = '96'.<br />
+GS_STUDENT-ZCODE = 'SSU-96'.<br />
+GS_STUDENT-ZKNAME = '###'.<br />
+GS_STUDENT-ZENAME = 'SSS'.<br />
+GS_STUDENT-ZGENDER = 'F'.<br />
+GS_STUDENT-ZTEL = '66666666666'.<br />
+APPEND GS_STUDENT TO GT_STUDENT.<br />
+<br />
+CLEAR : GS_STUDENT.<br />
+GS_STUDENT-ZPERNR = '97'.<br />
+GS_STUDENT-ZCODE = 'SSU-97'.<br />
+GS_STUDENT-ZKNAME = '###'.<br />
+GS_STUDENT-ZENAME = 'AAA'.<br />
+GS_STUDENT-ZGENDER = 'M'.<br />
+GS_STUDENT-ZTEL = '77777777777'.<br />
+APPEND GS_STUDENT TO GT_STUDENT.<br />
+<br />
+CLEAR : GS_STUDENT.<br />
+GS_STUDENT-ZPERNR = '98'.<br />
+GS_STUDENT-ZCODE = 'SSU-98'.<br />
+GS_STUDENT-ZKNAME = '###'.<br />
+GS_STUDENT-ZENAME = 'JJJ'.<br />
+GS_STUDENT-ZGENDER = 'M'.<br />
+GS_STUDENT-ZTEL = '88888888888'.<br />
+APPEND GS_STUDENT TO GT_STUDENT.<br />
+<br />
+CLEAR : GS_STUDENT.<br />
+GS_STUDENT-ZPERNR = '99'.<br />
+GS_STUDENT-ZCODE = 'SSU-99'.<br />
+GS_STUDENT-ZKNAME = '###'.<br />
+GS_STUDENT-ZENAME = 'CCC'.<br />
+GS_STUDENT-ZGENDER = 'M'.<br />
+GS_STUDENT-ZTEL = '99999999999'.<br />
+APPEND GS_STUDENT TO GT_STUDENT.<br />
+<br />
+<br />
+<br />
+INSERT ZEDT10_001 FROM TABLE GT_STUDENT.<br />
+<br />
+ENDFORM.<br />
+            </div>
+          </td>
+        </tr>
+      </table>
+      </td>
+      </tr>
+   <tr>
+<td class="footer">Extracted by Mass Download version 1.4.6 - E.G.Mellodew. 1998-2025. Sap Release 750</td>
+   </tr>
+</table>
+</body>
+</html>
