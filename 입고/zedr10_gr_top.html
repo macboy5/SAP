@@ -1,0 +1,207 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="application/xhtml+xml; charset=EUC-KR" />
+<title>ZEDR10_GR_TOP</title>
+<style type="text/css">
+.code{ font-family:"Courier New", Courier, monospace; color:#000; font-size:14px; background-color:#F2F4F7 }
+  .codeComment {font-family:"Courier New", Courier, monospace; color:#0000F0; font-size:14px; background-color:#F2F4F7 }
+  .normalBold{ font-family:Arial, Helvetica, sans-serif; color:#000; font-size:12px; font-weight:800 }
+  .normalBoldLarge{ font-family:Arial, Helvetica, sans-serif; color:#000; font-size:16px; font-weight:800 }
+</style>
+<style type="text/css">
+  .normal{ font-family:Arial, Helvetica, sans-serif; color:#000; font-size:12px }
+  .footer{ font-family:Arial, Helvetica, sans-serif; color:#000; font-size:12px; text-align: center }
+  h2{ font-family:Arial, Helvetica, sans-serif; color:#000; font-size:16px; font-weight:800 }
+  h3{ font-family:Arial, Helvetica, sans-serif; color:#000; font-size:14px; font-weight:800 }
+  .outerTable{
+   background-color:#E0E7ED;
+   width:100%;
+   border-top-width: thin;
+   border-right-width: thin;
+   border-right-width: thin;
+   border-left-width: thin;
+   border-top-style: solid;
+   border-right-style: solid;
+   border-bottom-style: solid;
+   border-left-style: solid;
+  }
+  .innerTable{
+   background-color:#F2F4F7;
+   width:100%;
+   border-top-width: thin;
+   border-right-width: thin;
+   border-bottom-width: thin;
+   border-left-width: thin;
+   border-top-style: solid;
+   border-right-style: solid;
+   border-bottom-style: solid;
+   border-left-style: solid;
+  }
+</style>
+</head>
+<body>
+<table class="outerTable">
+  <tr class="normalBoldLarge">
+     <td><h2>Code listing for: ZEDR10_GR_TOP</h2>
+<h3> Description: Include ZEDR10_GR_TOP</h3></td>
+   </tr>
+  <tr>
+     <td>
+     <table class="innerTable">
+       <tr>
+          <td>
+   <div class="codeComment">
+*&---------------------------------------------------------------------*<br />
+*&&nbsp;&nbsp;Include&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ZEDR10_GR_TOP<br />
+*&---------------------------------------------------------------------*<br />
+<br />
+   </div>
+   <div class="code">
+TABLES : ZMKPF10, ZMSEG10.<br />
+<br />
+DATA : GS_ZEKKO10 TYPE ZEKKO10.<br />
+DATA : GT_ZEKKO10 LIKE TABLE OF GS_ZEKKO10.<br />
+<br />
+DATA : GS_ZEKPO10 TYPE ZEKPO10.<br />
+DATA : GT_ZEKPO10 LIKE TABLE OF GS_ZEKPO10.<br />
+<br />
+DATA : GS_ZMKPF10 TYPE ZMKPF10.<br />
+DATA : GT_ZMKPF10 LIKE TABLE OF GS_ZMKPF10.<br />
+<br />
+DATA : GS_ZMSEG10 TYPE ZMSEG10.<br />
+DATA : GT_ZMSEG10 LIKE TABLE OF GS_ZMSEG10.<br />
+<br />
+DATA : GS_ZBKPF10 TYPE ZBKPF10.<br />
+DATA : GT_ZBKPF10 LIKE TABLE OF GS_ZBKPF10.<br />
+<br />
+DATA : GS_ZBSEG10 TYPE ZBSEG10.<br />
+DATA : GT_ZBSEG10 LIKE TABLE OF GS_ZBSEG10.<br />
+<br />
+" GR ## ### : ## + ###<br />
+DATA : BEGIN OF GS_GR.<br />
+&nbsp;&nbsp;DATA&nbsp;:&nbsp;ICON&nbsp;TYPE&nbsp;C,&nbsp;&nbsp;&nbsp;"&nbsp;###&nbsp;##<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MBLNR&nbsp;TYPE&nbsp;ZMKPF10-MBLNR,&nbsp;"&nbsp;######<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MJAHR&nbsp;TYPE&nbsp;ZMKPF10-MJAHR,&nbsp;"&nbsp;####<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BLART&nbsp;TYPE&nbsp;ZMKPF10-BLART,&nbsp;"&nbsp;####<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BLDAT&nbsp;TYPE&nbsp;ZMKPF10-BLDAT,&nbsp;"&nbsp;###<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BUDAT&nbsp;TYPE&nbsp;ZMKPF10-BUDAT,&nbsp;"&nbsp;###<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ZEILE&nbsp;TYPE&nbsp;ZMSEG10-ZEILE,&nbsp;"&nbsp;#####<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MATNR&nbsp;TYPE&nbsp;ZMSEG10-MATNR,&nbsp;"&nbsp;####<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;WERKS&nbsp;TYPE&nbsp;ZMSEG10-WERKS,&nbsp;"&nbsp;###<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;LGORT&nbsp;TYPE&nbsp;ZMSEG10-LGORT,&nbsp;"&nbsp;####<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;LIFNR&nbsp;TYPE&nbsp;ZMSEG10-LIFNR,&nbsp;"&nbsp;#####<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;WAERS&nbsp;TYPE&nbsp;ZMSEG10-WAERS,&nbsp;"&nbsp;###<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MENGE&nbsp;TYPE&nbsp;ZMSEG10-MENGE,&nbsp;"&nbsp;##<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MEINS&nbsp;TYPE&nbsp;ZMSEG10-MEINS,&nbsp;"&nbsp;##<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EBELN&nbsp;TYPE&nbsp;ZMSEG10-EBELN,&nbsp;"&nbsp;######<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BUKRS&nbsp;TYPE&nbsp;ZMSEG10-BUKRS,&nbsp;"&nbsp;####<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GJAHR&nbsp;TYPE&nbsp;ZMSEG10-GJAHR,&nbsp;"&nbsp;####<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BELNR&nbsp;TYPE&nbsp;ZMSEG10-BELNR,&nbsp;"&nbsp;####<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SHKZG&nbsp;TYPE&nbsp;ZMSEG10-SHKZG,&nbsp;"&nbsp;###<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DMBTR&nbsp;TYPE&nbsp;ZMSEG10-DMBTR.&nbsp;"&nbsp;##<br />
+DATA : END OF GS_GR.<br />
+DATA : GT_GR LIKE TABLE OF GS_GR.<br />
+<br />
+DATA : BEGIN OF GS_PO.            " -&gt; ALV DISPLAY#.<br />
+&nbsp;&nbsp;DATA&nbsp;:&nbsp;ICON&nbsp;TYPE&nbsp;C&nbsp;LENGTH&nbsp;4,&nbsp;&nbsp;&nbsp;&nbsp;"&nbsp;#####<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;L_CHECK&nbsp;TYPE&nbsp;C&nbsp;LENGTH&nbsp;1,&nbsp;"&nbsp;##&nbsp;####&nbsp;##<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MBLNR&nbsp;TYPE&nbsp;ZMKPF10-MBLNR,&nbsp;"&nbsp;######<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EBELN&nbsp;TYPE&nbsp;ZEKKO10-EBELN,&nbsp;"&nbsp;PO##<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BUKRS&nbsp;TYPE&nbsp;ZEKKO10-BUKRS,&nbsp;"&nbsp;####<br />
+   </div>
+   <div class="codeComment">
+*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EKGRP&nbsp;TYPE&nbsp;ZEKKO10-EKGRP,&nbsp;"&nbsp;####<br />
+*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EKORG&nbsp;TYPE&nbsp;ZEKKO10-EKORG,&nbsp;"&nbsp;####<br />
+   </div>
+   <div class="code">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;LIFNR&nbsp;TYPE&nbsp;ZEKKO10-LIFNR,&nbsp;"&nbsp;###(##)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BEDAT&nbsp;TYPE&nbsp;ZEKKO10-BEDAT,&nbsp;"&nbsp;###<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EBELP&nbsp;TYPE&nbsp;ZEKPO10-EBELP,&nbsp;"&nbsp;##<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MATNR&nbsp;TYPE&nbsp;ZEKPO10-MATNR,&nbsp;"&nbsp;####<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MAKTX&nbsp;TYPE&nbsp;ZEKPO10-MAKTX,&nbsp;"&nbsp;###<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MENGE&nbsp;TYPE&nbsp;ZEKPO10-MENGE,&nbsp;"&nbsp;##<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;REMAIN_MENGE&nbsp;TYPE&nbsp;ZEKPO10-MENGE,&nbsp;"&nbsp;##&nbsp;##&nbsp;(####)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MEINS&nbsp;TYPE&nbsp;ZEKPO10-MEINS,&nbsp;"&nbsp;##<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BPRME&nbsp;TYPE&nbsp;ZEKPO10-BPRME,&nbsp;"&nbsp;##<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;WAERS&nbsp;TYPE&nbsp;ZEKKO10-WAERS,&nbsp;"&nbsp;##<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PRDAT&nbsp;TYPE&nbsp;ZEKPO10-PRDAT,&nbsp;"&nbsp;###<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;WERKS&nbsp;TYPE&nbsp;ZEKPO10-WERKS,&nbsp;"&nbsp;###<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;LGORT&nbsp;TYPE&nbsp;ZEKPO10-LGORT,&nbsp;"&nbsp;####<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BELNR&nbsp;TYPE&nbsp;ZBKPF10-BELNR,&nbsp;"&nbsp;####<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GJAHR&nbsp;TYPE&nbsp;ZBKPF10-GJAHR,&nbsp;"&nbsp;####<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SHKZG&nbsp;TYPE&nbsp;ZBSEG10-SHKZG,&nbsp;"&nbsp;###<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DMBTR&nbsp;TYPE&nbsp;ZBSEG10-DMBTR.&nbsp;"&nbsp;##<br />
+DATA : END OF GS_PO.<br />
+DATA : GT_PO LIKE TABLE OF GS_PO.<br />
+<br />
+<br />
+DATA : BEGIN OF GS_FI.      " ## ###<br />
+&nbsp;&nbsp;DATA&nbsp;:&nbsp;ICON&nbsp;TYPE&nbsp;C&nbsp;LENGTH&nbsp;4,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BUKRS&nbsp;TYPE&nbsp;ZBKPF10-BUKRS,&nbsp;"&nbsp;####<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BELNR&nbsp;TYPE&nbsp;ZBKPF10-BELNR,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GJAHR&nbsp;TYPE&nbsp;ZBKPF10-GJAHR,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BLART&nbsp;TYPE&nbsp;ZBKPF10-BLART,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BLDAT&nbsp;TYPE&nbsp;ZBKPF10-BLDAT,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BUDAT&nbsp;TYPE&nbsp;ZBKPF10-BUDAT,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BUZEI&nbsp;TYPE&nbsp;ZBSEG10-BUZEI,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BSCHL&nbsp;TYPE&nbsp;ZBSEG10-BSCHL,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SHKZG&nbsp;TYPE&nbsp;ZBSEG10-SHKZG,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DMBTR&nbsp;TYPE&nbsp;ZBSEG10-DMBTR,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PSWSL&nbsp;TYPE&nbsp;ZBSEG10-PSWSL,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;HKONT&nbsp;TYPE&nbsp;ZBSEG10-HKONT,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;HKONT_NAME&nbsp;TYPE&nbsp;C&nbsp;LENGTH&nbsp;20,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;LIFNR&nbsp;TYPE&nbsp;ZBSEG10-LIFNR.<br />
+DATA : END OF GS_FI.<br />
+DATA : GT_FI LIKE TABLE OF GS_FI.<br />
+<br />
+<br />
+<br />
+<br />
+DATA : OK_CODE TYPE SY-UCOMM.<br />
+<br />
+DATA : GC_DOCKING_0100 TYPE REF TO CL_GUI_DOCKING_CONTAINER.  " ## ##<br />
+DATA : GC_DOCKING_0200 TYPE REF TO CL_GUI_DOCKING_CONTAINER.  " ## ##<br />
+DATA : GC_DOCKING_0300 TYPE REF TO CL_GUI_DOCKING_CONTAINER.  " ## ##<br />
+<br />
+DATA : GC_GRID_0100 TYPE REF TO CL_GUI_ALV_GRID.<br />
+DATA : GC_GRID_0200 TYPE REF TO CL_GUI_ALV_GRID.<br />
+DATA : GC_GRID_0300 TYPE REF TO CL_GUI_ALV_GRID.<br />
+<br />
+DATA : GS_FIELDCAT_0100 TYPE LVC_S_FCAT.<br />
+DATA : GT_FIELDCAT_0100 TYPE LVC_T_FCAT.<br />
+DATA : GS_FIELDCAT_0200 TYPE LVC_S_FCAT.<br />
+DATA : GT_FIELDCAT_0200 TYPE LVC_T_FCAT.<br />
+DATA : GS_FIELDCAT_0300 TYPE LVC_S_FCAT.<br />
+DATA : GT_FIELDCAT_0300 TYPE LVC_T_FCAT.<br />
+<br />
+DATA : GS_SORT_0100 TYPE LVC_S_SORT.<br />
+DATA : GT_SORT_0100 TYPE LVC_T_SORT.<br />
+DATA : GS_SORT_0200 TYPE LVC_S_SORT.<br />
+DATA : GT_SORT_0200 TYPE LVC_T_SORT.<br />
+DATA : GS_SORT_0300 TYPE LVC_S_SORT.<br />
+DATA : GT_SORT_0300 TYPE LVC_T_SORT.<br />
+<br />
+DATA : GS_LAYOUT_0100 TYPE LVC_S_LAYO.<br />
+DATA : GS_LAYOUT_0200 TYPE LVC_S_LAYO.<br />
+DATA : GS_LAYOUT_0300 TYPE LVC_S_LAYO.<br />
+<br />
+DATA : GS_VARIANT TYPE DISVARIANT.<br />
+<br />
+DATA : GO_EVENT_0100 TYPE REF TO EVENT.<br />
+DATA : GO_EVENT_0200 TYPE REF TO EVENT.<br />
+DATA : GO_EVENT_0300 TYPE REF TO EVENT.<br />
+<br />
+DATA : GV_FINUM TYPE I. "##### ##.<br />
+            </div>
+          </td>
+        </tr>
+      </table>
+      </td>
+      </tr>
+   <tr>
+<td class="footer">Extracted by Mass Download version 1.4.6 - E.G.Mellodew. 1998-2025. Sap Release 750</td>
+   </tr>
+</table>
+</body>
+</html>
