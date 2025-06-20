@@ -1,0 +1,16 @@
+*&---------------------------------------------------------------------*
+*& Report ZEDR10_GR
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZEDR10_GR.
+
+INCLUDE ZEDR10_GR_CLS.
+INCLUDE ZEDR10_GR_TOP.
+INCLUDE ZEDR10_GR_SCR.
+INCLUDE ZEDR10_GR_F01.
+INCLUDE ZEDR10_GR_PBO.
+INCLUDE ZEDR10_GR_PAI.
+
+START-OF-SELECTION.
+  PERFORM VERIFY_SCR.
